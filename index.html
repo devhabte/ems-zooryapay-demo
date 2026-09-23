@@ -254,16 +254,8 @@
   <section id="connects">
     <div class="sec-head">
       <div class="kicker">Architecture</div>
-      <h2>How it connects — the same pattern E‑commerce uses today</h2>
-      <p>Not a new integration shape. It's the mechanism zooryapay-merchant already uses to reach the ERP service, extended to one more backend.</p>
-    </div>
-    <div class="flow">
-      <div class="flow-step"><span class="flow-num">1</span><h4>Merchant session</h4><p>One sign-in. Eclipse issues a JWT the portal already holds — nothing new here.</p><span class="tag">JWT</span></div>
-      <div class="flow-step"><span class="flow-num">2</span><h4>api-gateway</h4><p>Every call carries the merchant's own organisation id.</p><span class="tag">X-Merchant-Id</span></div>
-      <div class="flow-step"><span class="flow-num">3</span><h4>EMS service</h4><p>Registered beside erp, integration-service, etradeAPI. Trusts the header the same way erp's own filter does.</p><span class="tag">eureka-server</span></div>
-      <div class="flow-step"><span class="flow-num">4</span><h4>Public route</h4><p>A buyer with no account reaches the storefront the same way today's public booking links work.</p><span class="tag">unauthenticated</span></div>
-      <div class="flow-step"><span class="flow-num">5</span><h4>Hosted checkout</h4><p>EMS opens a Zoorya Pay session — telebirr, M‑Pesa or EthSwitch.</p><span class="tag">zoorya-checkout</span></div>
-      <div class="flow-step"><span class="flow-num">6</span><h4>Wallet settles</h4><p>Webhook confirms. Money lands straight in the organiser's own wallet. EMS never holds it.</p><span class="tag">webhook</span></div>
+      <h2>How it connects</h2>
+      <p>JWT authentication — the same way E‑commerce does it today. No new login, no API key to mint: EMS trusts the same signed-in session zooryapay-merchant already uses to reach erp, carrying the merchant's own identity on every call.</p>
     </div>
   </section>
 
