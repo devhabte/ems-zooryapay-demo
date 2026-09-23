@@ -232,7 +232,7 @@ const I18N = {
     back:'Back', payZoorya:'Pay with Zoorya Pay →', getFree:'Get free tickets',
     goingTitle:"You're going!", print:'Print', done:'Done', draftPreview:'Preview — this event is still a draft',
     left:'left', minPerOrder:n=>`min ${n}/order`, onSaleFrom:d=>`On sale ${d}`, salesEnded:'Sales ended',
-    free:'Free', poweredBy:'Payments by Zoorya Pay', orgTitle:'Zoorya Events', orgSub:'All upcoming events, ticketed and settled through Zoorya Pay.', sold:'sold'},
+    free:'Free', chooseSeats:'Choose seats', changeSeats:'Change', addNSeats:n=>`Add ${n} seat${n>1?'s':''}`, holdLabel:'Held for', seatsReleased:'Your held seats were released — pick again when ready.', poweredBy:'Payments by Zoorya Pay', orgTitle:'Zoorya Events', orgSub:'All upcoming events, ticketed and settled through Zoorya Pay.', sold:'sold'},
   am: {tickets:'ትኬቶች', total:'ጠቅላላ', selectTickets:'ትኬት ይምረጡ', continueN:n=>`ቀጥል — ${n} ትኬት`,
     payWith:'በtelebirr · M-Pesa · EthSwitch ይክፈሉ', soldOut:'ትኬት አልቋል', joinWaitlist:'የመጠባበቂያ ዝርዝር ይቀላቀሉ',
     promoCode:'የቅናሽ ኮድ', apply:'ተግብር', about:'ስለ ይህ ዝግጅት', location:'አካባቢ',
@@ -240,7 +240,7 @@ const I18N = {
     back:'ተመለስ', payZoorya:'በZoorya Pay ይክፈሉ →', getFree:'ነጻ ትኬት ያግኙ',
     goingTitle:'እየሄዱ ነው!', print:'አትም', done:'ተጠናቋል', draftPreview:'ቅድመ-እይታ — ይህ ዝግጅት አሁንም ረቂቅ ነው',
     left:'ቀርቷል', minPerOrder:n=>`ዝቅተኛ ${n}/ትዕዛዝ`, onSaleFrom:d=>`ሽያጭ ${d} ይጀምራል`, salesEnded:'ሽያጭ ተጠናቋል',
-    free:'ነጻ', poweredBy:'ክፍያ በZoorya Pay', orgTitle:'ዙርያ ዝግጅቶች', orgSub:'ሁሉም መጪ ዝግጅቶች፣ በZoorya Pay የሚሸጡ እና የሚከፈሉ።', sold:'ተሽጧል'},
+    free:'ነጻ', chooseSeats:'መቀመጫ ይምረጡ', changeSeats:'ቀይር', addNSeats:n=>`${n} መቀመጫ ጨምር`, holdLabel:'ተይዟል ለ', seatsReleased:'የያዟቸው መቀመጫዎች ተለቀዋል — ዝግጁ ሲሆኑ እንደገና ይምረጡ።', poweredBy:'ክፍያ በZoorya Pay', orgTitle:'ዙርያ ዝግጅቶች', orgSub:'ሁሉም መጪ ዝግጅቶች፣ በZoorya Pay የሚሸጡ እና የሚከፈሉ።', sold:'ተሽጧል'},
   om: {tickets:'Tikeeta', total:'Waliigala', selectTickets:'Tikeeta filadhu', continueN:n=>`Itti fufi — Tikeeta ${n}`,
     payWith:'telebirr · M-Pesa · EthSwitch tiin kaffali', soldOut:'Xumurame', joinWaitlist:'Tarree eeggannoo seeni',
     promoCode:"Kooda hir'annaa", apply:'Fayyadami', about:"Waa'ee taatee kanaa", location:'Bakka',
@@ -248,7 +248,7 @@ const I18N = {
     back:"Deebi'i", payZoorya:'Zoorya Pay tiin kaffali →', getFree:'Tikeeta bilisaa argadhu',
     goingTitle:'Deemaa jirta!', print:'Maxxansi', done:'Xumuramee', draftPreview:"Ilaalcha — taateen kun ammallee qopheessaa dha",
     left:'hafe', minPerOrder:n=>`xiqqaa ${n}/ajaja`, onSaleFrom:d=>`Gurgurtaan ${d} jalqaba`, salesEnded:'Gurgurtaan xumurameera',
-    free:'Bilisaa', poweredBy:'Kaffaltiin Zoorya Pay tiin', orgTitle:'Taateewwan Zoorya', orgSub:'Taateewwan dhufan hunda, Zoorya Pay tiin gurguramanii kaffalaman.', sold:'gurguramee'},
+    free:'Bilisaa', chooseSeats:'Teessoo filadhu', changeSeats:'Jijjiiri', addNSeats:n=>`Teessoo ${n} itti dabali`, holdLabel:'Kan qabame', seatsReleased:"Teessoowwan qabaman gadi lakkifamaniiru — yeroo qophooftan irra deebi'aa filadhaa.", poweredBy:'Kaffaltiin Zoorya Pay tiin', orgTitle:'Taateewwan Zoorya', orgSub:'Taateewwan dhufan hunda, Zoorya Pay tiin gurguramanii kaffalaman.', sold:'gurguramee'},
   ti: {tickets:'ቲኬታት', total:'ጠቅላላ', selectTickets:'ቲኬት ምረጽ', continueN:n=>`ቀጽል — ${n} ቲኬት`,
     payWith:'ብtelebirr · M-Pesa · EthSwitch ክፈል', soldOut:'ተወዲኡ', joinWaitlist:'ናብ ናይ ምጽባይ ዝርዝር ተጸንበር',
     promoCode:'ናይ ቅናሽ ኮድ', apply:'ተግብር', about:'ብዛዕባ እዚ ፍጻመ', location:'ቦታ',
@@ -256,7 +256,7 @@ const I18N = {
     back:'ተመለስ', payZoorya:'ብZoorya Pay ክፈል →', getFree:'ናጻ ቲኬት ርኸብ',
     goingTitle:'ትኸይድ ኣለኻ!', print:'ሕተም', done:'ተወዲኡ', draftPreview:'ቅድመ-ትርኢት — እዚ ፍጻመ ገና ንድፊ እዩ',
     left:'ተሪፉ', minPerOrder:n=>`ውሱን ${n}/ትእዛዝ`, onSaleFrom:d=>`ሽያጥ ${d} ይጅምር`, salesEnded:'ሽያጥ ተወዲኡ',
-    free:'ናጻ', poweredBy:'ክፍሊት ብZoorya Pay', orgTitle:'ፍጻመታት ዙርያ', orgSub:'ኩሎም ዝመጹ ፍጻመታት፣ ብZoorya Pay ዝሽየጡን ዝኽፈሉን።', sold:'ተሸይጡ'},
+    free:'ናጻ', chooseSeats:'መንበር ምረጽ', changeSeats:'ቀይር', addNSeats:n=>`${n} መንበር ወስኽ`, holdLabel:'ተታሒዙ ን', seatsReleased:'እተታሕዙ መንበራት ተፈቲሖም — ድሉዋት ምስ ኮንኩም ደጊምኩም ምረጹ።', poweredBy:'ክፍሊት ብZoorya Pay', orgTitle:'ፍጻመታት ዙርያ', orgSub:'ኩሎም ዝመጹ ፍጻመታት፣ ብZoorya Pay ዝሽየጡን ዝኽፈሉን።', sold:'ተሸይጡ'},
   so: {tickets:'Tigidhada', total:'Wadarta', selectTickets:'Dooro tigidh', continueN:n=>`Sii wad — ${n} tigidh`,
     payWith:'Ku bixi telebirr · M-Pesa · EthSwitch', soldOut:'Way dhamaatay', joinWaitlist:'Ku biir liiska sugitaanka',
     promoCode:'Koodhka dhorsiga', apply:'Codso', about:'Ku saabsan dhacdadan', location:'Goobta',
@@ -264,7 +264,7 @@ const I18N = {
     back:'Dib u noqo', payZoorya:'Ku bixi Zoorya Pay →', getFree:'Hel tigidh bilaash ah',
     goingTitle:'Waad tagaysaa!', print:'Daabac', done:'Dhammaystiran', draftPreview:'Fiiro hore — dhacdadani weli waa qabyo',
     left:'hadhay', minPerOrder:n=>`ugu yaraan ${n}/dalab`, onSaleFrom:d=>`Iibku wuxuu bilaabmayaa ${d}`, salesEnded:'Iibku wuu dhammaaday',
-    free:'Bilaash', poweredBy:'Lacag bixinta Zoorya Pay', orgTitle:'Dhacdooyinka Zoorya', orgSub:'Dhammaan dhacdooyinka soo socda, lagu iibiyo oo lagu bixiyo Zoorya Pay.', sold:'la iibiyay'}
+    free:'Bilaash', chooseSeats:'Dooro kursiga', changeSeats:'Bedel', addNSeats:n=>`Ku dar ${n} kursi`, holdLabel:'La haystay', seatsReleased:'Kursiyadaadii la haystay waa la sii daayay — mar kale dooro marka diyaar tahid.', poweredBy:'Lacag bixinta Zoorya Pay', orgTitle:'Dhacdooyinka Zoorya', orgSub:'Dhammaan dhacdooyinka soo socda, lagu iibiyo oo lagu bixiyo Zoorya Pay.', sold:'la iibiyay'}
 };
 let lang = 'en';
 try { lang = localStorage.getItem('hievents-lang') || 'en'; } catch {}
@@ -297,7 +297,8 @@ function seed() {
      description:'An evening of live Ethio-jazz with a full band. Doors open at 19:30.',
      tickets:[
        {id:'T4', name:'Standing', price:500, qty:180, desc:'', minPerOrder:1, maxPerOrder:10, saleStart:null, saleEnd:now + 8*day},
-       {id:'T5', name:'Table (seat)', price:1500, qty:11, desc:'Reserved seating, 1 drink', minPerOrder:1, maxPerOrder:4, saleStart:null, saleEnd:null}],
+       {id:'T5', name:'Table (seat)', price:1500, qty:11, desc:'Reserved seating, 1 drink', minPerOrder:1, maxPerOrder:4, saleStart:null, saleEnd:null},
+       {id:'T8', name:'Front Row (seated)', price:2000, qty:18, desc:'Pick your own seat, closest to the stage', minPerOrder:1, maxPerOrder:4, saleStart:null, saleEnd:null, seated:true, seatRows:['A','B','C'], seatCols:6}],
      promos:[],
      doors:[{id:'D1', name:'Main entrance', types:[]}],
      waitlist:[
@@ -314,7 +315,7 @@ function seed() {
   let n = 0;
   for (let i = 0; i < 46; i++) {
     const ev = i < 32 ? events[0] : events[1];
-    const t = ev.tickets[i % (ev.id === 'EV1' ? 3 : ev.tickets.length)];
+    const t = ev.tickets[i % (ev.id === 'EV1' ? 3 : 2)];
     const qty = 1 + (i % 3 === 0 ? 1 : 0) + (i % 7 === 0 ? 1 : 0);
     const buyer = names[i % names.length];
     const created = now - (i * 0.3 + Math.random()) * day;
@@ -332,6 +333,13 @@ function seed() {
       attendees.push({id:'A-' + (5000 + n), code:'TKT-' + uid(''), orderId:oid, eventId:ev.id, ticketId:t.id, ticket:t.name, name:q === 0 ? buyer : names[(i + q + 5) % names.length], email:buyer.toLowerCase().replace(' ', '.') + '@gmail.com', status:cancelledHere ? 'cancelled' : 'active', checkedIn:checked});
     }
   }
+  // A handful of pre-sold seats for the seated ticket type, so the seat map opens with a realistic mix of taken/available rather than empty.
+  const seatSales = [{oid:'ORD-1090', buyer:'Mahlet Yilma', seats:['A5', 'B2']}, {oid:'ORD-1091', buyer:'Henok Fikru', seats:['B3', 'C1']}];
+  seatSales.forEach((s, si) => {
+    const created = now - (2 + si) * day;
+    orders.push({id:s.oid, eventId:'EV2', buyer:s.buyer, email:s.buyer.toLowerCase().replace(' ', '.') + '@gmail.com', phone:'+2519' + (20000000 + si * 1111111), items:[{ticketId:'T8', name:'Front Row (seated)', qty:s.seats.length, price:2000, refundedQty:0}], total:2000 * s.seats.length, discount:0, refundedAmount:0, rail:'telebirr', status:'paid', created, txRef:'ZP-' + (881000 + si)});
+    s.seats.forEach(seat => { n++; attendees.push({id:'A-' + (5000 + n), code:'TKT-' + uid(''), orderId:s.oid, eventId:'EV2', ticketId:'T8', ticket:'Front Row (seated)', name:s.buyer, email:s.buyer.toLowerCase().replace(' ', '.') + '@gmail.com', status:'active', checkedIn:null, seat}); });
+  });
   return {events, orders, attendees, currentEvent:'EV1', scanLog:[], branding: defaultBranding()};
 }
 let S;
@@ -347,6 +355,7 @@ const evOrders = (e) => S.orders.filter(o => o.eventId === e.id);
 
 /* ============ routing ============ */
 let route = 'dashboard', tab = 'tickets', pubCart = {}, pubPromo = null, attQuery = '', curDoor = null;
+let pubSeats = {}, holdRemaining = 0, holdTimer = null;
 function go(r) { route = r; location.hash = r; render(); window.scrollTo(0, 0); }
 window.addEventListener('hashchange', () => { const r = location.hash.slice(1); if (r && r !== route) { route = r; render(); } });
 
@@ -534,7 +543,7 @@ function attendeesView() {
     <input class="input" style="max-width:240px" placeholder="Search name, email, code…" value="${esc(attQuery)}" oninput="attQuery=this.value;render();const i=document.querySelector('main input');i.focus();i.setSelectionRange(i.value.length,i.value.length)">
     <button class="btn" onclick="exportCSV('attendees')">Export CSV</button></div>
   <div class="card"><div class="tbl-wrap"><table><tr><th>Name</th><th>Ticket</th><th>Code</th><th>Order</th><th>Status</th><th></th></tr>
-  ${list.map(a => `<tr><td><b>${esc(a.name)}</b><div class="muted small">${esc(a.email)}</div></td><td>${esc(a.ticket)}</td><td style="font-family:monospace">${a.code}</td><td>${a.orderId}</td>
+  ${list.map(a => `<tr><td><b>${esc(a.name)}</b><div class="muted small">${esc(a.email)}</div></td><td>${esc(a.ticket)}${a.seat ? `<div class="muted small">Seat ${a.seat}</div>` : ''}</td><td style="font-family:monospace">${a.code}</td><td>${a.orderId}</td>
     <td>${a.status === 'cancelled' ? '<span class="badge bad">cancelled</span>' : a.checkedIn ? `<span class="badge ok">checked in ${fmtTime(a.checkedIn)}</span>` : '<span class="badge">not checked in</span>'}</td>
     <td class="num"><button class="btn sm" onclick="showTicket('${a.id}')">Ticket</button></td></tr>`).join('') || '<tr><td colspan="6" class="empty">No attendees match</td></tr>'}</table></div></div>`;
 }
@@ -798,8 +807,10 @@ function renderPublic() {
           if (notYet) action = `<span class="badge warn">${t('onSaleFrom', fmtDate(tk.saleStart))}</span>`;
           else if (ended) action = `<span class="badge bad">${t('salesEnded')}</span>`;
           else if (left <= 0) action = `<button class="btn sm" onclick="waitlistModal('${tk.id}')">${t('joinWaitlist')}</button>`;
+          else if (tk.seated) action = q ? `<button class="btn sm" onclick="seatMapModal('${tk.id}')">${q} · ${t('changeSeats')}</button>` : `<button class="btn sm primary" onclick="seatMapModal('${tk.id}')">${t('chooseSeats')}</button>`;
           else action = `<div class="stepper"><button onclick="cart('${tk.id}',-1)">−</button><span>${q}</span><button onclick="cart('${tk.id}',1)">+</button></div>`;
-          return `<div class="tkt"><div style="flex:1"><b>${esc(tk.name)}</b><div class="small muted">${tk.price ? birr(tk.price) : t('free')}${left < 20 && left > 0 ? ` · <span style="color:var(--warn)">${left} ${t('left')}</span>` : ''}${minNote}</div>${tk.desc ? `<div class="small muted">${esc(tk.desc)}</div>` : ''}</div>
+          const seatNote = tk.seated && (pubSeats[tk.id] || []).length ? `<div class="small" style="color:var(--brand)">Seats: ${pubSeats[tk.id].join(', ')}</div>` : '';
+          return `<div class="tkt"><div style="flex:1"><b>${esc(tk.name)}</b><div class="small muted">${tk.price ? birr(tk.price) : t('free')}${left < 20 && left > 0 ? ` · <span style="color:var(--warn)">${left} ${t('left')}</span>` : ''}${minNote}</div>${tk.desc ? `<div class="small muted">${esc(tk.desc)}</div>` : ''}${seatNote}</div>
           ${action}</div>`;
         }).join('')}
         <div style="padding:14px 16px;border-top:1px solid var(--line)">
@@ -835,6 +846,73 @@ function joinWaitlist(tid) {
   const e = ev(); e.waitlist = e.waitlist || [];
   e.waitlist.push({id: uid('W-'), ticketId: tid, name, email, at: Date.now()});
   save(); closeModal(); toast("You're on the waitlist — we'll email you if a spot opens up.");
+}
+
+/* ============ seat selection ============ */
+function takenSeats(tid) {
+  return new Set(S.attendees.filter(a => a.ticketId === tid && a.status === 'active' && a.seat).map(a => a.seat));
+}
+function stopHoldTimer() { clearInterval(holdTimer); holdTimer = null; holdRemaining = 0; }
+function startHoldTimer(tid) {
+  if (holdTimer) return;
+  holdRemaining = 300;
+  holdTimer = setInterval(() => {
+    holdRemaining--;
+    const el = document.getElementById('holdClock');
+    if (el) el.textContent = Math.floor(holdRemaining / 60) + ':' + String(holdRemaining % 60).padStart(2, '0');
+    if (holdRemaining <= 0) {
+      stopHoldTimer(); const had = pubSeats[tid] && pubSeats[tid].length;
+      pubSeats[tid] = []; delete pubCart[tid];
+      closeModal(); renderPublic();
+      if (had) toast(t('seatsReleased'));
+    }
+  }, 1000);
+}
+function seatMapModal(tid) {
+  const tk = ev().tickets.find(x => x.id === tid);
+  const taken = takenSeats(tid);
+  pubSeats[tid] = pubSeats[tid] || [];
+  const draw = () => {
+    const mine = new Set(pubSeats[tid]);
+    const rows = tk.seatRows.map(r => `<div class="row" style="gap:6px;margin-bottom:6px;justify-content:center">
+      <span class="small muted" style="width:16px">${r}</span>
+      ${Array.from({length: tk.seatCols}, (_, i) => i + 1).map(c => {
+        const sid = r + c, isTaken = taken.has(sid), isMine = mine.has(sid);
+        const cls = isTaken ? 'background:var(--bad-soft);color:var(--bad);cursor:not-allowed' : isMine ? 'background:var(--brand);color:var(--brand-ink)' : 'background:var(--panel);border:1px solid var(--line);cursor:pointer';
+        return `<button ${isTaken ? 'disabled' : ''} onclick="toggleSeat('${tid}','${sid}')" style="width:30px;height:30px;border:0;border-radius:6px;font-size:11px;font-weight:600;${cls}">${c}</button>`;
+      }).join('')}
+    </div>`).join('');
+    const count = pubSeats[tid].length;
+    modal(`<h2>${t('chooseSeats')}</h2>
+    <div class="row" style="justify-content:center;gap:14px;margin-bottom:10px" class="small muted">
+      <span class="small"><span style="display:inline-block;width:10px;height:10px;background:var(--panel);border:1px solid var(--line);border-radius:3px;margin-right:4px"></span>Available</span>
+      <span class="small"><span style="display:inline-block;width:10px;height:10px;background:var(--brand);border-radius:3px;margin-right:4px"></span>Selected</span>
+      <span class="small"><span style="display:inline-block;width:10px;height:10px;background:var(--bad-soft);border-radius:3px;margin-right:4px"></span>Taken</span>
+    </div>
+    <div style="padding:12px;border:1px solid var(--line);border-radius:10px;margin-bottom:14px">
+      <div class="small muted" style="text-align:center;margin-bottom:10px">🎤 Stage</div>${rows}
+    </div>
+    ${count ? `<div class="small muted" style="text-align:center;margin-bottom:10px">${t('holdLabel')} <b id="holdClock" style="color:var(--warn)">${Math.floor(holdRemaining / 60)}:${String(holdRemaining % 60).padStart(2, '0')}</b> · ${count}/${tk.maxPerOrder}</div>` : ''}
+    <div class="row" style="justify-content:flex-end"><button class="btn" onclick="closeModal()">${t('back')}</button><button class="btn primary" ${count ? '' : 'disabled'} onclick="commitSeats('${tid}')">${t('addNSeats', count)}</button></div>`);
+  };
+  draw();
+}
+function toggleSeat(tid, sid) {
+  const tk = ev().tickets.find(x => x.id === tid);
+  const list = pubSeats[tid] = pubSeats[tid] || [];
+  const i = list.indexOf(sid);
+  if (i >= 0) list.splice(i, 1);
+  else {
+    const left = tk.qty - sold(tid);
+    if (list.length >= Math.min(tk.maxPerOrder, left)) return toast(`Max ${tk.maxPerOrder} seats per order`);
+    list.push(sid);
+  }
+  if (list.length) startHoldTimer(tid); else stopHoldTimer();
+  seatMapModal(tid);
+}
+function commitSeats(tid) {
+  pubCart[tid] = (pubSeats[tid] || []).length;
+  closeModal(); renderPublic();
 }
 function waitlistOrgModal(tid) {
   const e = ev(), t = e.tickets.find(x => x.id === tid);
@@ -921,8 +999,9 @@ function completeOrder(rail) {
   const items = e.tickets.filter(x => pubCart[x.id]).map(x => ({ticketId: x.id, name: x.name, qty: pubCart[x.id], price: x.price}));
   S.orders.push({id: oid, eventId: e.id, buyer: pendingBuyer.name, email: pendingBuyer.email, phone: pendingBuyer.phone, items, total: tot.total, discount: tot.discount, rail, status: 'paid', created: Date.now(), txRef: 'ZP-' + (890000 + S.orders.length)});
   const issued = [];
-  items.forEach(i => { for (let q = 0; q < i.qty; q++) { const a = {id: uid('A-'), code: 'TKT-' + uid(''), orderId: oid, eventId: e.id, ticketId: i.ticketId, ticket: i.name, name: pendingBuyer.name, email: pendingBuyer.email, status: 'active', checkedIn: null}; S.attendees.push(a); issued.push(a); } });
+  items.forEach(i => { const seats = (pubSeats[i.ticketId] || []).slice(); for (let q = 0; q < i.qty; q++) { const a = {id: uid('A-'), code: 'TKT-' + uid(''), orderId: oid, eventId: e.id, ticketId: i.ticketId, ticket: i.name, name: pendingBuyer.name, email: pendingBuyer.email, status: 'active', checkedIn: null, seat: seats[q] || null}; S.attendees.push(a); issued.push(a); } });
   if (pubPromo) pubPromo.uses++;
+  stopHoldTimer(); pubSeats = {};
   pubCart = {}; pubPromo = null; save(); renderPublic();
   modal(`<div style="text-align:center;margin-bottom:14px"><div style="font-size:40px;color:var(--ok)">✓</div><h2 style="margin:0">${t('goingTitle')}</h2>
     <div class="muted">Order ${oid} · ${rail === 'free' ? t('free') : birr(tot.total) + ' via ' + rail}</div><div class="small muted">Tickets also sent to ${esc(pendingBuyer.email)}</div></div>
@@ -932,7 +1011,7 @@ function completeOrder(rail) {
 }
 function ticketHTML(a) {
   const e = S.events.find(x => x.id === a.eventId);
-  return `<div class="ticket"><div class="l"><div class="small muted">${esc(e.name)}</div><b>${esc(a.ticket)}</b><div class="small">${esc(a.name)}</div><div class="small muted">${fmtDate(e.start)}</div>
+  return `<div class="ticket"><div class="l"><div class="small muted">${esc(e.name)}</div><b>${esc(a.ticket)}${a.seat ? ` · Seat ${a.seat}` : ''}</b><div class="small">${esc(a.name)}</div><div class="small muted">${fmtDate(e.start)}</div>
     <div style="font-family:monospace;margin-top:6px;font-weight:600">${a.code}</div></div><div class="r">${qr(a.code)}</div></div>`;
 }
 function showTicket(id) { modal(`<h2>Ticket</h2>${ticketHTML(S.attendees.find(a => a.id === id))}<div class="row" style="justify-content:flex-end"><button class="btn primary" onclick="closeModal()">Close</button></div>`); }
