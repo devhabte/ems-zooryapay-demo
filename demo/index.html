@@ -175,6 +175,7 @@ video{width:100%;border-radius:10px;background:#000;max-height:260px;object-fit:
   <div class="seg">
     <button id="modeOrg" class="on" onclick="go('dashboard')">Organizer</button>
     <button id="modePub" onclick="go('public')">Event page</button>
+    <button id="modeHome" onclick="go('orghome')">Organizer page</button>
   </div>
   <button class="btn sm hide-sm" onclick="resetDemo()" title="Reset demo data">Reset</button>
 </div>
@@ -193,7 +194,7 @@ video{width:100%;border-radius:10px;background:#000;max-height:260px;object-fit:
 
 <script>
 /* ============ state ============ */
-const KEY = 'hievents-zp-demo-v1';
+const KEY = 'hievents-zp-demo-v2';
 const COVERS = ['linear-gradient(135deg,#6a4fc7,#c0569b)','linear-gradient(135deg,#0f7a53,#2bb3a3)','linear-gradient(135deg,#d9822b,#c2410c)','linear-gradient(135deg,#1e3a8a,#3b82f6)'];
 const uid = (p) => p + Math.random().toString(36).slice(2, 8).toUpperCase();
 const birr = (n) => 'ETB ' + Number(n).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
@@ -207,16 +208,27 @@ function seed() {
     {id:'EV1', name:'Addis Tech Summit 2026', venue:'Skylight Hotel, Addis Ababa', start:new Date(now + 18*day).setHours(9,0,0,0), capacity:600, status:'live', cover:0,
      description:'Two days of talks, workshops and demos from Ethiopia\'s fintech, AI and startup scene. Lunch and coffee included for all ticket holders.',
      tickets:[
-       {id:'T1', name:'Early Bird', price:750, qty:150, desc:'Limited early pricing'},
-       {id:'T2', name:'Regular', price:1200, qty:350, desc:'Full two-day access'},
-       {id:'T3', name:'VIP', price:3500, qty:100, desc:'Front rows, speaker dinner, swag bag'}],
-     promos:[{code:'ZOORYA10', pct:10, uses:0, max:100}]},
+       {id:'T1', name:'Early Bird', price:750, qty:150, desc:'Limited early pricing', minPerOrder:1, maxPerOrder:6, saleStart:null, saleEnd:now + 3*day},
+       {id:'T2', name:'Regular', price:1200, qty:350, desc:'Full two-day access', minPerOrder:1, maxPerOrder:8, saleStart:null, saleEnd:null},
+       {id:'T3', name:'VIP', price:3500, qty:100, desc:'Front rows, speaker dinner, swag bag', minPerOrder:2, maxPerOrder:4, saleStart:null, saleEnd:null},
+       {id:'T7', name:'Student Pass', price:300, qty:100, desc:'Valid student ID checked at the door', minPerOrder:1, maxPerOrder:4, saleStart:now + 5*day, saleEnd:null}],
+     promos:[{code:'ZOORYA10', pct:10, uses:0, max:100}],
+     doors:[{id:'D1', name:'Main entrance', types:[]}, {id:'D2', name:'VIP entrance', types:['T3']}],
+     waitlist:[]},
     {id:'EV2', name:'Ethio-Jazz Night', venue:'Fendika Cultural Center', start:new Date(now + 9*day).setHours(20,0,0,0), capacity:250, status:'live', cover:2,
      description:'An evening of live Ethio-jazz with a full band. Doors open at 19:30.',
-     tickets:[{id:'T4', name:'Standing', price:500, qty:180, desc:''},{id:'T5', name:'Table (seat)', price:1500, qty:70, desc:'Reserved seating, 1 drink'}],
-     promos:[]},
+     tickets:[
+       {id:'T4', name:'Standing', price:500, qty:180, desc:'', minPerOrder:1, maxPerOrder:10, saleStart:null, saleEnd:now + 8*day},
+       {id:'T5', name:'Table (seat)', price:1500, qty:11, desc:'Reserved seating, 1 drink', minPerOrder:1, maxPerOrder:4, saleStart:null, saleEnd:null}],
+     promos:[],
+     doors:[{id:'D1', name:'Main entrance', types:[]}],
+     waitlist:[
+       {id:'W1', ticketId:'T5', name:'Tsion Abera', email:'tsion.abera@gmail.com', at: now - 2*day},
+       {id:'W2', ticketId:'T5', name:'Biruk Negash', email:'biruk.negash@gmail.com', at: now - 1*day}]},
     {id:'EV3', name:'Startup Founders Breakfast', venue:'Hyatt Regency, Addis Ababa', start:new Date(now + 30*day).setHours(7,30,0,0), capacity:80, status:'draft', cover:1,
-     description:'Networking breakfast for founders and investors.', tickets:[{id:'T6', name:'Free RSVP', price:0, qty:80, desc:''}], promos:[]}
+     description:'Networking breakfast for founders and investors.',
+     tickets:[{id:'T6', name:'Free RSVP', price:0, qty:80, desc:'', minPerOrder:1, maxPerOrder:2, saleStart:null, saleEnd:null}],
+     promos:[], doors:[{id:'D1', name:'Main entrance', types:[]}], waitlist:[]}
   ];
   const names = ['Abebe Kebede','Meron Tesfaye','Dawit Alemu','Hanna Girma','Yonas Bekele','Selam Haile','Samuel Tadesse','Liya Mulugeta','Kidus Assefa','Bethlehem Worku','Nahom Getachew','Ruth Desta','Eyob Mengistu','Tsion Abera','Biruk Negash','Mahlet Yilma','Henok Fikru','Saron Lemma'];
   const rails = ['telebirr','telebirr','M-Pesa','EthSwitch'];
@@ -224,17 +236,22 @@ function seed() {
   let n = 0;
   for (let i = 0; i < 46; i++) {
     const ev = i < 32 ? events[0] : events[1];
-    const t = ev.tickets[i % ev.tickets.length];
+    const t = ev.tickets[i % (ev.id === 'EV1' ? 3 : ev.tickets.length)];
     const qty = 1 + (i % 3 === 0 ? 1 : 0) + (i % 7 === 0 ? 1 : 0);
     const buyer = names[i % names.length];
     const created = now - (i * 0.3 + Math.random()) * day;
     const oid = 'ORD-' + (1040 + i);
-    const status = i === 5 ? 'refunded' : 'paid';
-    orders.push({id:oid, eventId:ev.id, buyer, email:buyer.toLowerCase().replace(' ', '.') + '@gmail.com', phone:'+2519' + (10000000 + i * 1234567 % 89999999), items:[{ticketId:t.id, name:t.name, qty, price:t.price}], total:t.price*qty, discount:0, rail:rails[i % 4], status, created, txRef:'ZP-' + (880000 + i)});
+    let status = 'paid';
+    if (i === 5) status = 'refunded';
+    if (i === 12) status = 'partially_refunded';
+    const partialQty = i === 12 ? 1 : 0;
+    const refundedAmount = i === 12 ? t.price * partialQty : 0;
+    orders.push({id:oid, eventId:ev.id, buyer, email:buyer.toLowerCase().replace(' ', '.') + '@gmail.com', phone:'+2519' + (10000000 + i * 1234567 % 89999999), items:[{ticketId:t.id, name:t.name, qty, price:t.price, refundedQty:partialQty}], total:t.price*qty, discount:0, refundedAmount, rail:rails[i % 4], status, created, txRef:'ZP-' + (880000 + i)});
     for (let q = 0; q < qty; q++) {
       n++;
-      const checked = status === 'paid' && ev.id === 'EV1' && n % 4 === 0 ? created + day : null;
-      attendees.push({id:'A-' + (5000 + n), code:'TKT-' + uid(''), orderId:oid, eventId:ev.id, ticketId:t.id, ticket:t.name, name:q === 0 ? buyer : names[(i + q + 5) % names.length], email:buyer.toLowerCase().replace(' ', '.') + '@gmail.com', status:status === 'refunded' ? 'cancelled' : 'active', checkedIn:checked});
+      const cancelledHere = status === 'refunded' || (i === 12 && q === 0);
+      const checked = !cancelledHere && ev.id === 'EV1' && n % 4 === 0 ? created + day : null;
+      attendees.push({id:'A-' + (5000 + n), code:'TKT-' + uid(''), orderId:oid, eventId:ev.id, ticketId:t.id, ticket:t.name, name:q === 0 ? buyer : names[(i + q + 5) % names.length], email:buyer.toLowerCase().replace(' ', '.') + '@gmail.com', status:cancelledHere ? 'cancelled' : 'active', checkedIn:checked});
     }
   }
   return {events, orders, attendees, currentEvent:'EV1', scanLog:[]};
@@ -250,7 +267,7 @@ const evAttendees = (e) => S.attendees.filter(a => a.eventId === e.id);
 const evOrders = (e) => S.orders.filter(o => o.eventId === e.id);
 
 /* ============ routing ============ */
-let route = 'dashboard', tab = 'tickets', pubCart = {}, pubPromo = null, attQuery = '';
+let route = 'dashboard', tab = 'tickets', pubCart = {}, pubPromo = null, attQuery = '', curDoor = null;
 function go(r) { route = r; location.hash = r; render(); window.scrollTo(0, 0); }
 window.addEventListener('hashchange', () => { const r = location.hash.slice(1); if (r && r !== route) { route = r; render(); } });
 
@@ -262,11 +279,13 @@ const NAV = [
 
 function render() {
   stopCamera();
-  const isPub = route === 'public';
+  const isPub = route === 'public' || route === 'orghome';
   document.getElementById('orgView').classList.toggle('hidden', isPub);
   document.getElementById('pubView').classList.toggle('hidden', !isPub);
   document.getElementById('modeOrg').classList.toggle('on', !isPub);
-  document.getElementById('modePub').classList.toggle('on', isPub);
+  document.getElementById('modePub').classList.toggle('on', route === 'public');
+  document.getElementById('modeHome').classList.toggle('on', route === 'orghome');
+  if (route === 'orghome') return renderOrgHome();
   if (isPub) return renderPublic();
   document.getElementById('evPick').innerHTML = S.events.map(e => `<option value="${e.id}" ${e.id === ev().id ? 'selected' : ''}>${esc(e.name)}</option>`).join('');
   document.getElementById('nav').innerHTML = NAV.map(n => n[0] === 'sec' ? `<div class="sec">${n[1]}</div>` : `<a class="${route === n[0] ? 'on' : ''}" onclick="go('${n[0]}')"><span>${n[1]}</span>${n[2]}</a>`).join('');
@@ -277,19 +296,21 @@ function render() {
 
 /* ============ organizer views ============ */
 function dashboard() {
-  const e = ev(), os = evOrders(e).filter(o => o.status === 'paid'), at = evAttendees(e).filter(a => a.status === 'active');
-  const rev = os.reduce((s, o) => s + o.total, 0), chk = at.filter(a => a.checkedIn).length;
+  const e = ev(), os = evOrders(e).filter(o => o.status === 'paid' || o.status === 'partially_refunded'), at = evAttendees(e).filter(a => a.status === 'active');
+  const rev = os.reduce((s, o) => s + (o.total - (o.refundedAmount || 0)), 0), chk = at.filter(a => a.checkedIn).length;
+  const refundedCount = evOrders(e).filter(o => o.status === 'refunded' || o.status === 'partially_refunded').length;
   const days = [...Array(14)].map((_, i) => { const d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate() - 13 + i); return d; });
   const byDay = days.map(d => os.filter(o => o.created >= +d && o.created < +d + 864e5).reduce((s, o) => s + o.total, 0));
   const max = Math.max(...byDay, 1);
   return `
   <div class="page-h"><div><h1>${esc(e.name)}</h1><div class="muted">${fmtDate(e.start)} · ${esc(e.venue)}</div></div><div class="spacer"></div>
     <span class="badge ${e.status === 'live' ? 'ok' : 'warn'}">${e.status.toUpperCase()}</span>
+    <button class="btn" onclick="duplicateEvent('${e.id}')">⧉ Duplicate</button>
     <button class="btn" onclick="S.currentEvent='${e.id}';go('public')">View event page ↗</button></div>
   <div class="grid g4">
     ${stat('Tickets sold', at.length, `of ${e.capacity} capacity`)}
-    ${stat('Gross revenue', birr(rev), 'settled to Zoorya Pay wallet')}
-    ${stat('Orders', os.length, `${evOrders(e).length - os.length} refunded`)}
+    ${stat('Net revenue', birr(rev), 'settled to Zoorya Pay wallet')}
+    ${stat('Orders', os.length, `${refundedCount} refunded/partial`)}
     ${stat('Checked in', chk, at.length ? Math.round(chk / at.length * 100) + '% of attendees' : '—')}
   </div>
   <div class="grid g2" style="margin-top:14px">
@@ -312,7 +333,8 @@ function eventsView() {
       <div class="ev-cover" style="background:${COVERS[e.cover % COVERS.length]}">${new Date(e.start).toLocaleDateString('en-GB', {day:'numeric', month:'short'}).toUpperCase()}</div>
       <div class="body"><div class="row"><h3 style="font-size:15px">${esc(e.name)}</h3><div class="spacer"></div><span class="badge ${e.status === 'live' ? 'ok' : 'warn'}">${e.status}</span></div>
       <div class="muted small" style="margin:4px 0 10px">${esc(e.venue)}</div>
-      <div class="progress"><b style="width:${Math.min(100, s / e.capacity * 100)}%"></b></div><div class="small muted" style="margin-top:6px">${s} / ${e.capacity} sold</div></div></div>`;
+      <div class="progress"><b style="width:${Math.min(100, s / e.capacity * 100)}%"></b></div>
+      <div class="row" style="margin-top:6px"><span class="small muted">${s} / ${e.capacity} sold</span><div class="spacer"></div><button class="btn sm" onclick="event.stopPropagation();duplicateEvent('${e.id}')" title="Duplicate">⧉ Duplicate</button></div></div></div>`;
   }).join('')}</div>`;
 }
 
@@ -320,10 +342,19 @@ function eventView() {
   const e = ev();
   const T = {tickets:'Tickets', details:'Event details', share:'Share & embed'};
   let body = '';
-  if (tab === 'tickets') body = `<div class="card"><div class="row" style="padding:14px 16px"><h3>Ticket types</h3><div class="spacer"></div><button class="btn primary sm" onclick="ticketModal()">+ Add ticket</button></div>
+  if (tab === 'tickets') { const now = Date.now(); body = `<div class="card"><div class="row" style="padding:14px 16px"><h3>Ticket types</h3><div class="spacer"></div><button class="btn primary sm" onclick="ticketModal()">+ Add ticket</button></div>
     <div class="tbl-wrap"><table><tr><th>Name</th><th class="num">Price</th><th class="num">Sold</th><th class="num">Quantity</th><th></th></tr>
-    ${e.tickets.map(t => `<tr><td><b>${esc(t.name)}</b><div class="muted small">${esc(t.desc)}</div></td><td class="num">${t.price ? birr(t.price) : '<span class="badge ok">Free</span>'}</td><td class="num">${sold(t.id)}</td><td class="num">${t.qty}</td>
-      <td class="num"><button class="btn sm" onclick="ticketModal('${t.id}')">Edit</button></td></tr>`).join('')}</table></div></div>`;
+    ${e.tickets.map(t => {
+      const s = sold(t.id), left = t.qty - s;
+      let saleNote = '';
+      if (t.saleStart && now < t.saleStart) saleNote = `<div class="small" style="color:var(--warn)">Not yet on sale · opens ${fmtDate(t.saleStart)}</div>`;
+      else if (t.saleEnd && now > t.saleEnd) saleNote = `<div class="small muted">Sale ended ${fmtDate(t.saleEnd)}</div>`;
+      else if (t.saleEnd) saleNote = `<div class="small muted">On sale until ${fmtDate(t.saleEnd)}</div>`;
+      const limitNote = (t.minPerOrder > 1 || t.maxPerOrder) ? `<div class="small muted">${t.minPerOrder > 1 ? `min ${t.minPerOrder}` : ''}${t.minPerOrder > 1 && t.maxPerOrder ? ' · ' : ''}${t.maxPerOrder ? `max ${t.maxPerOrder}/order` : ''}</div>` : '';
+      const wl = (e.waitlist || []).filter(w => w.ticketId === t.id).length;
+      return `<tr><td><b>${esc(t.name)}</b><div class="muted small">${esc(t.desc)}</div>${saleNote}${limitNote}</td><td class="num">${t.price ? birr(t.price) : '<span class="badge ok">Free</span>'}</td><td class="num">${s}</td><td class="num">${t.qty}</td>
+      <td class="num">${left <= 0 && wl > 0 ? `<button class="btn sm" onclick="waitlistOrgModal('${t.id}')">${wl} waiting</button> ` : ''}<button class="btn sm" onclick="ticketModal('${t.id}')">Edit</button></td></tr>`;
+    }).join('')}</table></div></div>`; }
   if (tab === 'details') body = `<div class="card pad" style="max-width:640px">
     <label class="f"><span>Event name</span><input class="input" id="fName" value="${esc(e.name)}"></label>
     <label class="f"><span>Venue</span><input class="input" id="fVenue" value="${esc(e.venue)}"></label>
@@ -335,7 +366,7 @@ function eventView() {
   if (tab === 'share') body = `<div class="card pad" style="max-width:640px"><h3>Public event page</h3><p class="muted">Buyers need no account. Share the link or embed the widget on any site.</p>
     <div class="row"><input class="input" readonly value="https://tickets.zooryapay.et/e/${e.id.toLowerCase()}/${slug(e.name)}"><button class="btn" onclick="go('public')">Open ↗</button></div>
     <h3 style="margin-top:18px">Embed widget</h3><textarea class="input" rows="3" readonly style="font-family:monospace;font-size:12px">&lt;script src="https://tickets.zooryapay.et/widget.js" data-event="${e.id}"&gt;&lt;/script&gt;</textarea></div>`;
-  return `<div class="page-h"><h1>${esc(e.name)}</h1></div>
+  return `<div class="page-h"><h1>${esc(e.name)}</h1><div class="spacer"></div><button class="btn sm" onclick="duplicateEvent('${e.id}')">⧉ Duplicate</button></div>
   <div class="tabs">${Object.entries(T).map(([k, v]) => `<button class="${tab === k ? 'on' : ''}" onclick="tab='${k}';render()">${v}</button>`).join('')}</div>${body}`;
 }
 const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -346,29 +377,74 @@ function saveDetails() {
   save(); render(); toast('Event saved');
 }
 const val = (id) => document.getElementById(id).value.trim();
+const valOrNull = (id) => { const v = document.getElementById(id).value; return v ? +new Date(v) : null; };
+function duplicateEvent(id) {
+  const src = S.events.find(x => x.id === id);
+  const copy = JSON.parse(JSON.stringify(src));
+  copy.id = uid('EV'); copy.name = src.name + ' (Copy)'; copy.status = 'draft'; copy.cover = S.events.length;
+  const idMap = {};
+  copy.tickets = copy.tickets.map(t => { const nid = uid('T'); idMap[t.id] = nid; return {...t, id: nid}; });
+  copy.doors = (copy.doors && copy.doors.length ? copy.doors : [{id: 'D1', name: 'Main entrance', types: []}])
+    .map(d => ({...d, id: uid('D'), types: (d.types || []).map(tid => idMap[tid]).filter(Boolean)}));
+  copy.promos = []; copy.waitlist = [];
+  S.events.push(copy); S.currentEvent = copy.id; save(); tab = 'details'; go('event'); toast('Event duplicated — update the date, then publish');
+}
 
 function orderTable(list, actions = true) {
   if (!list.length) return '<div class="empty">No orders yet</div>';
-  return `<div class="tbl-wrap"><table><tr><th>Order</th><th>Buyer</th><th>Tickets</th><th>Paid via</th><th class="num">Total</th><th>Status</th>${actions ? '<th></th>' : ''}</tr>
-  ${list.map(o => `<tr><td><b>${o.id}</b><div class="muted small">${fmtDate(o.created)}</div></td><td>${esc(o.buyer)}<div class="muted small">${esc(o.email)}</div></td>
-    <td>${o.items.map(i => `${i.qty}× ${esc(i.name)}`).join('<br>')}</td><td>${railBadge(o.rail)}<div class="muted small">${o.txRef}</div></td>
-    <td class="num">${birr(o.total)}</td><td><span class="badge ${o.status === 'paid' ? 'ok' : 'bad'}">${o.status}</span></td>
-    ${actions ? `<td class="num">${o.status === 'paid' && o.total > 0 ? `<button class="btn sm danger" onclick="refund('${o.id}')">Refund</button>` : ''}</td>` : ''}</tr>`).join('')}</table></div>`;
+  const tone = s => s === 'paid' ? 'ok' : s === 'partially_refunded' ? 'warn' : 'bad';
+  const label = s => s === 'partially_refunded' ? 'partial refund' : s;
+  return `<div class="tbl-wrap"><table><tr><th>Order</th><th>Buyer</th><th>Tickets</th><th>Paid via</th><th class="num">Net total</th><th>Status</th>${actions ? '<th></th>' : ''}</tr>
+  ${list.map(o => {
+    const net = o.total - (o.refundedAmount || 0);
+    const refundable = o.total > 0 && o.items.some(i => (i.refundedQty || 0) < i.qty) && o.status !== 'refunded';
+    return `<tr><td><b>${o.id}</b><div class="muted small">${fmtDate(o.created)}</div></td><td>${esc(o.buyer)}<div class="muted small">${esc(o.email)}</div></td>
+    <td>${o.items.map(i => `${i.qty}× ${esc(i.name)}${i.refundedQty ? ` <span class="small muted">(${i.refundedQty} refunded)</span>` : ''}`).join('<br>')}</td><td>${railBadge(o.rail)}<div class="muted small">${o.txRef}</div></td>
+    <td class="num">${birr(net)}</td><td><span class="badge ${tone(o.status)}">${label(o.status)}</span></td>
+    ${actions ? `<td class="num">${refundable ? `<button class="btn sm danger" onclick="refund('${o.id}')">Refund</button>` : ''}</td>` : ''}</tr>`;
+  }).join('')}</table></div>`;
 }
 const railBadge = (r) => `<span class="badge">${r}</span>`;
 function ordersView() {
   const list = evOrders(ev()).slice().sort((a, b) => b.created - a.created);
   return `<div class="page-h"><h1>Orders</h1><span class="badge">${list.length}</span><div class="spacer"></div><button class="btn" onclick="exportCSV('orders')">Export CSV</button></div><div class="card">${orderTable(list)}</div>`;
 }
+let refundQtys = [];
 function refund(id) {
   const o = S.orders.find(x => x.id === id);
-  modal(`<h2>Refund ${o.id}?</h2><p>${birr(o.total)} will be returned to <b>${esc(o.buyer)}</b> via ${o.rail}, debited from your Zoorya Pay wallet. All ${o.items.reduce((s, i) => s + i.qty, 0)} ticket(s) on this order will be cancelled.</p>
-  <div class="row" style="justify-content:flex-end"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="doRefund('${id}')">Issue refund</button></div>`);
+  refundQtys = o.items.map(() => 0);
+  const rows = o.items.map((it, i) => {
+    const remaining = it.qty - (it.refundedQty || 0);
+    return `<div class="row" style="padding:8px 0;border-bottom:1px solid var(--line)">
+      <div><b>${esc(it.name)}</b><div class="small muted">${remaining} of ${it.qty} refundable · ${birr(it.price)} each</div></div><div class="spacer"></div>
+      <div class="stepper"><button onclick="adjRefundQty('${id}',${i},-1)">−</button><span id="rq${i}">0</span><button onclick="adjRefundQty('${id}',${i},1)">+</button></div>
+    </div>`;
+  }).join('');
+  modal(`<h2>Refund ${o.id}</h2><p class="muted">Choose how many of each ticket to refund. The amount is debited from your Zoorya Pay wallet and returned to <b>${esc(o.buyer)}</b> via ${o.rail}; the matching ticket(s) are cancelled.</p>
+  ${rows}
+  <div class="row" style="margin-top:12px"><b>Refund total</b><div class="spacer"></div><b id="refundTotal">${birr(0)}</b></div>
+  <div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" id="refundBtn" disabled onclick="doRefund('${id}')">Issue refund</button></div>`);
+}
+function adjRefundQty(id, i, d) {
+  const o = S.orders.find(x => x.id === id), it = o.items[i], remaining = it.qty - (it.refundedQty || 0);
+  refundQtys[i] = Math.max(0, Math.min(remaining, refundQtys[i] + d));
+  document.getElementById('rq' + i).textContent = refundQtys[i];
+  const total = o.items.reduce((s, x, idx) => s + x.price * refundQtys[idx], 0);
+  document.getElementById('refundTotal').textContent = birr(total);
+  document.getElementById('refundBtn').disabled = total <= 0;
 }
 function doRefund(id) {
-  const o = S.orders.find(x => x.id === id); o.status = 'refunded';
-  S.attendees.filter(a => a.orderId === id).forEach(a => a.status = 'cancelled');
-  save(); closeModal(); render(); toast(`Refunded ${birr(o.total)} to ${o.buyer}`);
+  const o = S.orders.find(x => x.id === id);
+  let amount = 0;
+  o.items.forEach((it, i) => {
+    const q = refundQtys[i] || 0; if (q <= 0) return;
+    amount += q * it.price; it.refundedQty = (it.refundedQty || 0) + q;
+    S.attendees.filter(a => a.orderId === id && a.ticketId === it.ticketId && a.status === 'active').slice(0, q).forEach(a => { a.status = 'cancelled'; });
+  });
+  o.refundedAmount = (o.refundedAmount || 0) + amount;
+  const fullyRefunded = o.items.every(it => (it.refundedQty || 0) >= it.qty);
+  o.status = fullyRefunded ? 'refunded' : (o.refundedAmount > 0 ? 'partially_refunded' : o.status);
+  save(); closeModal(); render(); toast(`Refunded ${birr(amount)} to ${o.buyer}`);
 }
 
 function attendeesView() {
@@ -385,9 +461,15 @@ function attendeesView() {
 
 /* ============ check-in ============ */
 let lastScan = null, camStream = null, camTimer = null;
+function ensureDoors(e) { if (!e.doors || !e.doors.length) e.doors = [{id: 'D1', name: 'Main entrance', types: []}]; return e.doors; }
+function doorAllows(door, ticketId) { return !door.types || !door.types.length || door.types.includes(ticketId); }
 function checkinView() {
-  const at = evAttendees(ev()).filter(a => a.status === 'active'), chk = at.filter(a => a.checkedIn).length;
-  const log = S.scanLog.filter(l => l.eventId === ev().id).slice(0, 8);
+  const e = ev(), doors = ensureDoors(e);
+  if (!curDoor || !doors.some(d => d.id === curDoor)) curDoor = doors[0].id;
+  const door = doors.find(d => d.id === curDoor);
+  const at = evAttendees(e).filter(a => a.status === 'active' && doorAllows(door, a.ticketId));
+  const chk = at.filter(a => a.checkedIn).length;
+  const log = S.scanLog.filter(l => l.eventId === e.id && l.doorId === curDoor).slice(0, 8);
   let res = '<div class="scan-res" style="background:var(--bg);color:var(--muted)">Scan a ticket QR or type its code</div>';
   if (lastScan) {
     const a = S.attendees.find(x => x.id === lastScan.aid);
@@ -395,9 +477,12 @@ function checkinView() {
     if (lastScan.kind === 'dup') res = `<div class="scan-res warn"><div class="big">⚠ Already used</div><div>${esc(a.name)} · checked in at ${fmtTime(a.checkedIn)}</div></div>`;
     if (lastScan.kind === 'cancelled') res = `<div class="scan-res bad"><div class="big">✕ Ticket cancelled</div><div>${esc(a.name)} · order refunded</div></div>`;
     if (lastScan.kind === 'wrong') res = `<div class="scan-res bad"><div class="big">✕ Wrong event</div><div>This ticket is for another event</div></div>`;
+    if (lastScan.kind === 'wrongdoor') res = `<div class="scan-res warn"><div class="big">⚠ Wrong door</div><div>${esc(a.name)} · ${esc(a.ticket)} isn't valid at ${esc(door.name)}</div></div>`;
     if (lastScan.kind === 'none') res = `<div class="scan-res bad"><div class="big">✕ Invalid ticket</div><div>No ticket matches “${esc(lastScan.code)}”</div></div>`;
   }
-  return `<div class="page-h"><h1>Check-in</h1><div class="spacer"></div><span class="badge brand">Door 1 · live</span></div>
+  return `<div class="page-h"><h1>Check-in</h1><div class="spacer"></div>
+    <div class="seg">${doors.map(d => `<button class="${d.id === curDoor ? 'on' : ''}" onclick="curDoor='${d.id}';lastScan=null;render()">${esc(d.name)}</button>`).join('')}</div>
+    <button class="btn sm" onclick="doorModal()">+ Door</button></div>
   <div class="grid g2">
     <div class="card pad">
       <div class="row" style="margin-bottom:12px"><input id="scanInput" class="input" placeholder="TKT-XXXXXX" onkeydown="if(event.key==='Enter')doScan(this.value)"><button class="btn primary" onclick="doScan(val('scanInput'))">Check in</button></div>
@@ -406,30 +491,32 @@ function checkinView() {
       <div id="scanRes">${res}</div>
     </div>
     <div>
-      <div class="grid g2">${stat('Checked in', chk, `of ${at.length} attendees`)}${stat('Remaining', at.length - chk, 'still to arrive')}</div>
+      <div class="grid g2">${stat('Checked in', chk, `of ${at.length} at ${door.name}`)}${stat('Remaining', at.length - chk, 'still to arrive')}</div>
       <div class="progress" style="margin:14px 0;height:10px"><b style="width:${at.length ? chk / at.length * 100 : 0}%"></b></div>
-      <div class="card"><h3 style="padding:14px 16px 0">Scan log</h3>
-      ${log.length ? `<table>${log.map(l => `<tr><td class="small">${fmtTime(l.at)}</td><td>${esc(l.name)}</td><td><span class="badge ${l.kind === 'ok' ? 'ok' : l.kind === 'dup' ? 'warn' : 'bad'}">${{ok:'admitted', dup:'duplicate', cancelled:'cancelled', wrong:'wrong event', none:'invalid', undo:'undone'}[l.kind]}</span></td></tr>`).join('')}</table>` : '<div class="empty">No scans yet</div>'}</div>
+      <div class="card"><h3 style="padding:14px 16px 0">Scan log — ${esc(door.name)}</h3>
+      ${log.length ? `<table>${log.map(l => `<tr><td class="small">${fmtTime(l.at)}</td><td>${esc(l.name)}</td><td><span class="badge ${l.kind === 'ok' ? 'ok' : (l.kind === 'dup' || l.kind === 'wrongdoor') ? 'warn' : 'bad'}">${{ok:'admitted', dup:'duplicate', cancelled:'cancelled', wrong:'wrong event', wrongdoor:'wrong door', none:'invalid', undo:'undone'}[l.kind]}</span></td></tr>`).join('')}</table>` : '<div class="empty">No scans yet</div>'}</div>
     </div>
   </div>`;
 }
 function doScan(raw) {
   const code = String(raw || '').trim().toUpperCase();
   if (!code) return;
+  const e = ev(), doors = ensureDoors(e), door = doors.find(d => d.id === curDoor) || doors[0];
   const a = S.attendees.find(x => x.code === code);
   let kind;
   if (!a) kind = 'none';
-  else if (a.eventId !== ev().id) kind = 'wrong';
+  else if (a.eventId !== e.id) kind = 'wrong';
   else if (a.status === 'cancelled') kind = 'cancelled';
+  else if (!doorAllows(door, a.ticketId)) kind = 'wrongdoor';
   else if (a.checkedIn) kind = 'dup';
   else { kind = 'ok'; a.checkedIn = Date.now(); }
   lastScan = {kind, aid: a?.id, code};
-  S.scanLog.unshift({at: Date.now(), eventId: ev().id, name: a ? a.name : code, kind});
+  S.scanLog.unshift({at: Date.now(), eventId: e.id, doorId: curDoor, name: a ? a.name : code, kind});
   save(); render();
 }
 function undoCheckin(id) {
   const a = S.attendees.find(x => x.id === id); a.checkedIn = null; lastScan = null;
-  S.scanLog.unshift({at: Date.now(), eventId: ev().id, name: a.name, kind: 'undo'});
+  S.scanLog.unshift({at: Date.now(), eventId: ev().id, doorId: curDoor, name: a.name, kind: 'undo'});
   save(); render(); toast('Check-in undone');
 }
 function randomScan() {
@@ -437,6 +524,22 @@ function randomScan() {
   const r = Math.random();
   const pick = r < .12 ? {code: 'TKT-FAKE01'} : r < .3 ? pool.find(a => a.checkedIn) : pool.find(a => !a.checkedIn && a.status === 'active');
   doScan((pick || pool[0]).code);
+}
+function doorModal() {
+  const e = ev(), doors = ensureDoors(e);
+  modal(`<h2>New check-in door</h2>
+  <label class="f"><span>Door name</span><input class="input" id="dName" placeholder="e.g. VIP entrance"></label>
+  <label class="f"><span>Which tickets are valid here?</span></label>
+  <div class="small muted" style="margin-bottom:8px">Leave all unchecked to allow every ticket type.</div>
+  ${e.tickets.map(t => `<label style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><input type="checkbox" class="dType" value="${t.id}"> ${esc(t.name)}</label>`).join('')}
+  <div class="row" style="justify-content:flex-end;margin-top:6px"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="addDoor()">Create door</button></div>`);
+}
+function addDoor() {
+  const name = val('dName'); if (!name) return toast('Name this door');
+  const types = Array.prototype.map.call(document.querySelectorAll('.dType:checked'), el => el.value);
+  const e = ev(), doors = ensureDoors(e);
+  const d = {id: uid('D'), name, types};
+  doors.push(d); curDoor = d.id; save(); closeModal(); render(); toast('Door added');
 }
 async function toggleCamera() {
   if (camStream) return stopCamera(true);
@@ -475,11 +578,13 @@ function addPromo() {
 }
 
 function paymentsView() {
-  const paid = S.orders.filter(o => o.status === 'paid'), refunded = S.orders.filter(o => o.status === 'refunded');
-  const gross = paid.reduce((s, o) => s + o.total, 0), rf = refunded.reduce((s, o) => s + o.total, 0);
-  const byRail = {}; paid.forEach(o => byRail[o.rail] = (byRail[o.rail] || 0) + o.total);
+  const paidish = S.orders.filter(o => o.status === 'paid' || o.status === 'partially_refunded');
+  const refundedCount = S.orders.filter(o => o.status === 'refunded' || o.status === 'partially_refunded').length;
+  const gross = paidish.reduce((s, o) => s + (o.total - (o.refundedAmount || 0)), 0);
+  const rf = S.orders.reduce((s, o) => s + (o.refundedAmount || 0), 0);
+  const byRail = {}; paidish.forEach(o => byRail[o.rail] = (byRail[o.rail] || 0) + (o.total - (o.refundedAmount || 0)));
   return `<div class="page-h"><h1>Zoorya Pay</h1><span class="badge ok">Connected</span></div>
-  <div class="grid g3">${stat('Settled to wallet', birr(gross), 'all events, all time')}${stat('Refunded', birr(rf), refunded.length + ' orders')}${stat('Currency', 'ETB', 'locked for this deployment')}</div>
+  <div class="grid g3">${stat('Settled to wallet', birr(gross), 'net of refunds, all events')}${stat('Refunded', birr(rf), refundedCount + ' orders')}${stat('Currency', 'ETB', 'locked for this deployment')}</div>
   <div class="grid g2" style="margin-top:14px">
     <div class="card pad"><h3 style="margin-bottom:10px">Revenue by payment rail</h3>${Object.entries(byRail).map(([r, v]) => `<div style="margin-bottom:10px"><div class="row"><b>${r}</b><div class="spacer"></div><span>${birr(v)}</span></div><div class="progress" style="margin-top:6px"><b style="width:${v / gross * 100}%"></b></div></div>`).join('')}</div>
     <div class="card pad"><h3 style="margin-bottom:10px">How money moves</h3>
@@ -504,20 +609,28 @@ function createEvent() {
   const name = val('nName'); if (!name) return toast('Give the event a name');
   const cap = +val('nCap') || 100;
   const e = {id: uid('EV'), name, venue: val('nVenue') || 'Addis Ababa', start: +new Date(val('nStart')), capacity: cap, status: 'live', cover: S.events.length,
-    description: 'Join us for ' + name + '.', tickets: [{id: uid('T'), name: val('nTName') || 'General Admission', price: +val('nTPrice') || 0, qty: cap, desc: ''}], promos: []};
+    description: 'Join us for ' + name + '.',
+    tickets: [{id: uid('T'), name: val('nTName') || 'General Admission', price: +val('nTPrice') || 0, qty: cap, desc: '', minPerOrder: 1, maxPerOrder: 10, saleStart: null, saleEnd: null}],
+    promos: [], doors: [{id: 'D1', name: 'Main entrance', types: []}], waitlist: []};
   S.events.push(e); S.currentEvent = e.id; save(); closeModal(); tab = 'tickets'; go('event'); toast('Event created — it is live');
 }
 function ticketModal(id) {
-  const t = id ? ev().tickets.find(x => x.id === id) : {name: '', price: 0, qty: 100, desc: ''};
+  const t = id ? ev().tickets.find(x => x.id === id) : {name: '', price: 0, qty: 100, desc: '', minPerOrder: 1, maxPerOrder: 10, saleStart: null, saleEnd: null};
   modal(`<h2>${id ? 'Edit' : 'Add'} ticket type</h2>
   <label class="f"><span>Name</span><input class="input" id="tName" value="${esc(t.name)}" placeholder="VIP, Regular, Early Bird…"></label>
   <div class="grid g2"><label class="f"><span>Price (ETB, 0 = free)</span><input class="input" type="number" id="tPrice" value="${t.price}"></label>
   <label class="f"><span>Quantity available</span><input class="input" type="number" id="tQty" value="${t.qty}"></label></div>
   <label class="f"><span>Description</span><input class="input" id="tDesc" value="${esc(t.desc)}"></label>
+  <div class="grid g2"><label class="f"><span>Min per order</span><input class="input" type="number" id="tMin" value="${t.minPerOrder || 1}"></label>
+  <label class="f"><span>Max per order</span><input class="input" type="number" id="tMax" value="${t.maxPerOrder || 10}"></label></div>
+  <div class="grid g2"><label class="f"><span>On sale from (optional)</span><input class="input" type="datetime-local" id="tSaleStart" value="${t.saleStart ? toLocalInput(t.saleStart) : ''}"></label>
+  <label class="f"><span>On sale until (optional)</span><input class="input" type="datetime-local" id="tSaleEnd" value="${t.saleEnd ? toLocalInput(t.saleEnd) : ''}"></label></div>
   <div class="row"><div>${id ? `<button class="btn danger" onclick="delTicket('${id}')">Delete</button>` : ''}</div><div class="spacer"></div><button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="saveTicket('${id || ''}')">Save</button></div>`);
 }
 function saveTicket(id) {
-  const data = {name: val('tName') || 'Ticket', price: Math.max(0, +val('tPrice')), qty: Math.max(1, +val('tQty')), desc: val('tDesc')};
+  const minPerOrder = Math.max(1, +val('tMin') || 1);
+  const data = {name: val('tName') || 'Ticket', price: Math.max(0, +val('tPrice')), qty: Math.max(1, +val('tQty')), desc: val('tDesc'),
+    minPerOrder, maxPerOrder: Math.max(minPerOrder, +val('tMax') || 10), saleStart: valOrNull('tSaleStart'), saleEnd: valOrNull('tSaleEnd')};
   if (id) Object.assign(ev().tickets.find(x => x.id === id), data); else ev().tickets.push({id: uid('T'), ...data});
   save(); closeModal(); render(); toast('Ticket saved');
 }
@@ -541,8 +654,18 @@ function renderPublic() {
         ${e.status !== 'live' ? '<p class="badge warn" style="margin-top:14px">Preview — this event is still a draft</p>' : ''}</div>
       <div class="card">
         <div style="padding:14px 16px;border-bottom:1px solid var(--line)"><h3>Tickets</h3></div>
-        ${e.tickets.map(t => { const left = t.qty - sold(t.id), q = pubCart[t.id] || 0; return `<div class="tkt"><div style="flex:1"><b>${esc(t.name)}</b><div class="small muted">${t.price ? birr(t.price) : 'Free'}${left < 20 && left > 0 ? ` · <span style="color:var(--warn)">${left} left</span>` : ''}</div>${t.desc ? `<div class="small muted">${esc(t.desc)}</div>` : ''}</div>
-          ${left <= 0 ? '<span class="badge bad">Sold out</span>' : `<div class="stepper"><button onclick="cart('${t.id}',-1)">−</button><span>${q}</span><button onclick="cart('${t.id}',1)">+</button></div>`}</div>`; }).join('')}
+        ${e.tickets.map(t => {
+          const now = Date.now(), left = t.qty - sold(t.id), q = pubCart[t.id] || 0;
+          const notYet = t.saleStart && now < t.saleStart, ended = t.saleEnd && now > t.saleEnd;
+          const minNote = t.minPerOrder > 1 ? ` · min ${t.minPerOrder}/order` : '';
+          let action;
+          if (notYet) action = `<span class="badge warn">On sale ${fmtDate(t.saleStart)}</span>`;
+          else if (ended) action = `<span class="badge bad">Sales ended</span>`;
+          else if (left <= 0) action = `<button class="btn sm" onclick="waitlistModal('${t.id}')">Join waitlist</button>`;
+          else action = `<div class="stepper"><button onclick="cart('${t.id}',-1)">−</button><span>${q}</span><button onclick="cart('${t.id}',1)">+</button></div>`;
+          return `<div class="tkt"><div style="flex:1"><b>${esc(t.name)}</b><div class="small muted">${t.price ? birr(t.price) : 'Free'}${left < 20 && left > 0 ? ` · <span style="color:var(--warn)">${left} left</span>` : ''}${minNote}</div>${t.desc ? `<div class="small muted">${esc(t.desc)}</div>` : ''}</div>
+          ${action}</div>`;
+        }).join('')}
         <div style="padding:14px 16px;border-top:1px solid var(--line)">
           ${e.promos.length ? `<div class="row" style="margin-bottom:10px"><input class="input" id="promoIn" placeholder="Promo code" value="${pubPromo ? esc(pubPromo.code) : ''}"><button class="btn" onclick="applyPromo()">Apply</button></div>` : ''}
           ${pubPromo ? `<div class="row small"><span class="muted">Discount (${pubPromo.pct}%)</span><div class="spacer"></div><span>− ${birr(sub.discount)}</span></div>` : ''}
@@ -556,7 +679,54 @@ function renderPublic() {
 }
 function cart(tid, d) {
   const t = ev().tickets.find(x => x.id === tid), left = t.qty - sold(tid);
-  pubCart[tid] = Math.max(0, Math.min(Math.min(10, left), (pubCart[tid] || 0) + d)); renderPublic();
+  const min = t.minPerOrder || 1, max = Math.min(t.maxPerOrder || 10, left);
+  let q = pubCart[tid] || 0;
+  if (d > 0) q = q === 0 ? min : q + d;
+  else q = q <= min ? 0 : q + d;
+  pubCart[tid] = Math.max(0, Math.min(max, q));
+  renderPublic();
+}
+function waitlistModal(tid) {
+  const t = ev().tickets.find(x => x.id === tid);
+  modal(`<h2>Join the waitlist</h2><p class="muted">We'll email you if a ${esc(t.name)} spot opens up.</p>
+  <label class="f"><span>Full name</span><input class="input" id="wName"></label>
+  <label class="f"><span>Email</span><input class="input" id="wEmail" type="email"></label>
+  <div class="row" style="justify-content:flex-end"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="joinWaitlist('${tid}')">Join waitlist</button></div>`);
+}
+function joinWaitlist(tid) {
+  const name = val('wName'), email = val('wEmail');
+  if (!name || !/.+@.+\..+/.test(email)) return toast('Enter your name and a valid email');
+  const e = ev(); e.waitlist = e.waitlist || [];
+  e.waitlist.push({id: uid('W-'), ticketId: tid, name, email, at: Date.now()});
+  save(); closeModal(); toast("You're on the waitlist — we'll email you if a spot opens up.");
+}
+function waitlistOrgModal(tid) {
+  const e = ev(), t = e.tickets.find(x => x.id === tid);
+  const list = (e.waitlist || []).filter(w => w.ticketId === tid);
+  modal(`<h2>${esc(t.name)} waitlist</h2>${list.length ? list.map(w => `<div class="row" style="padding:8px 0;border-bottom:1px solid var(--line)"><div><b>${esc(w.name)}</b><div class="small muted">${esc(w.email)}</div></div><div class="spacer"></div><button class="btn sm primary" onclick="notifyWaitlist('${w.id}')">Notify</button></div>`).join('') : '<div class="empty">Nobody waiting</div>'}
+  <div class="row" style="justify-content:flex-end;margin-top:14px"><button class="btn" onclick="closeModal()">Close</button></div>`);
+}
+function notifyWaitlist(wid) {
+  const e = ev(), w = (e.waitlist || []).find(x => x.id === wid);
+  e.waitlist = (e.waitlist || []).filter(x => x.id !== wid);
+  save(); toast(`Notified ${w.name} — they have 24h to claim a spot`);
+  if (route === 'event') render(); else waitlistOrgModal(w.ticketId);
+}
+function renderOrgHome() {
+  const live = S.events.filter(e => e.status === 'live');
+  document.getElementById('pubView').innerHTML = `<div class="pub">
+    <div class="pub-hero" style="background:linear-gradient(135deg,#0f7a53,#0a5c3f)">
+      <span class="badge" style="background:rgba(255,255,255,.2);color:#fff;border:0">Organizer</span>
+      <h1>Zoorya Events</h1><div style="opacity:.9">All upcoming events, ticketed and settled through Zoorya Pay.</div>
+    </div>
+    <div class="grid g3">${live.map(e => {
+      const s = evAttendees(e).filter(a => a.status === 'active').length;
+      return `<div class="card ev-card" onclick="S.currentEvent='${e.id}';go('public')">
+        <div class="ev-cover" style="background:${COVERS[e.cover % COVERS.length]}">${new Date(e.start).toLocaleDateString('en-GB', {day:'numeric', month:'short'}).toUpperCase()}</div>
+        <div class="body"><h3 style="font-size:15px">${esc(e.name)}</h3><div class="muted small" style="margin:4px 0 10px">${esc(e.venue)}</div>
+        <div class="progress"><b style="width:${Math.min(100, s / e.capacity * 100)}%"></b></div><div class="small muted" style="margin-top:6px">${s} / ${e.capacity} sold</div></div></div>`;
+    }).join('') || '<div class="empty">No live events right now</div>'}</div>
+    <div class="powered">Payments by Zoorya Pay</div></div>`;
 }
 function cartTotals() {
   const e = ev(); let qty = 0, sub = 0;
