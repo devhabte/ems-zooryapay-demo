@@ -203,6 +203,8 @@
   /* ---- build cards ---- */
   .cols3{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
   @media (max-width:820px){ .cols3{ grid-template-columns:1fr; } }
+  .cols2{ display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
+  @media (max-width:700px){ .cols2{ grid-template-columns:1fr; } }
   .buildcard{ background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:18px; box-shadow:var(--shadow); }
   .buildcard h4{ font-size:13px; color:var(--navy); margin-bottom:12px; display:flex; align-items:center; gap:8px;}
   .buildcard h4 .sw{ width:8px;height:8px;border-radius:2px; background:var(--brand); }
@@ -287,7 +289,7 @@
       <div class="kicker">Scope</div>
       <h2>What we're building</h2>
     </div>
-    <div class="cols3">
+    <div class="cols2">
       <div class="buildcard">
         <h4><span class="sw"></span>In zooryapay-merchant</h4>
         <ul>
@@ -296,14 +298,21 @@
         </ul>
       </div>
       <div class="buildcard">
-        <h4><span class="sw"></span>EMS backend (new service)</h4>
+        <h4><span class="sw"></span>Events &amp; tickets</h4>
         <ul>
-          <li>Event — venue, date/time, capacity, status; single date or multi‑date schedule.</li>
-          <li>Ticket types — tiered pricing, per‑type/per‑date capacity, sale windows, registration questions.</li>
+          <li>Event — venue, date/time, capacity, status; single date or multi‑date schedule; one‑click duplication for recurring events.</li>
+          <li>Ticket types — tiered pricing, per‑type/per‑date capacity, sale windows (on‑sale from/until), min/max per order, registration questions.</li>
           <li>Order — multi‑ticket cart, promo codes, priced server‑side.</li>
-          <li>Public buyer storefront, reached through the gateway's public route.</li>
-          <li>Check‑in — camera/manual scan, live counts synced across devices.</li>
+          <li>Waitlists — sold‑out tickets collect names instead of turning buyers away; organisers notify people as spots free up.</li>
+          <li>Public buyer storefront and organiser homepage, reached through the gateway's public route, in English, Amharic, Afaan Oromoo, Tigrigna and Somali.</li>
+        </ul>
+      </div>
+      <div class="buildcard">
+        <h4><span class="sw"></span>Check‑in &amp; organiser tools</h4>
+        <ul>
+          <li>Check‑in — camera/manual scan, live counts synced across devices, multiple doors/check‑in lists (e.g. VIP entrance vs. general).</li>
           <li>Event‑level reporting — daily sales, per‑tier breakdown, CSV export.</li>
+          <li>Homepage Designer — cover image, logo, accent/background colour and font, applied live to the organiser page and checkout.</li>
         </ul>
       </div>
       <div class="buildcard">
@@ -311,7 +320,7 @@
         <ul>
           <li>EMS starts a hosted‑checkout session per order — same contract the booking‑link flow already proves out.</li>
           <li>Money settles straight into the organiser's existing wallet — no separate EMS‑side payout.</li>
-          <li>Refunds route through Zoorya Pay's existing refund mechanism.</li>
+          <li>Full or partial refunds, per ticket type, route through Zoorya Pay's existing refund mechanism.</li>
         </ul>
       </div>
     </div>
