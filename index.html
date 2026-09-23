@@ -1,0 +1,380 @@
+<title>EMS × Zoorya Pay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F6FAFB;
+    --surface:#FFFFFF;
+    --surface-alt:#EEF4F6;
+    --ink:#0F2733;
+    --muted:#5C7480;
+    --line:#DAE5E9;
+    --navy:#0E2C3D;
+    --navy-800:#153A4F;
+    --brand:#1E8FCC;
+    --brand-ink:#0E2C3D;
+    --brand-soft:#E2F1FA;
+    --good:#1E9E5A;
+    --good-soft:#E3F6EA;
+    --warn:#B7791F;
+    --warn-soft:#FBF0DC;
+    --crit:#C23B34;
+    --crit-soft:#FAE3E1;
+    --shadow: 0 1px 2px rgba(14,44,61,.06), 0 8px 24px -12px rgba(14,44,61,.18);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#0B1E29; --surface:#102A38; --surface-alt:#153548;
+      --ink:#EAF3F7; --muted:#9FB6C1; --line:#234656;
+      --navy:#EAF3F7; --navy-800:#CFE4EC;
+      --brand:#4FB4E8; --brand-ink:#EAF3F7; --brand-soft:#153C4F;
+      --good:#4FCB8B; --good-soft:#13332A;
+      --warn:#E4B04C; --warn-soft:#3A2E15;
+      --crit:#F0796F; --crit-soft:#3C1E1C;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px -12px rgba(0,0,0,.55);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#0B1E29; --surface:#102A38; --surface-alt:#153548;
+    --ink:#EAF3F7; --muted:#9FB6C1; --line:#234656;
+    --navy:#EAF3F7; --navy-800:#CFE4EC;
+    --brand:#4FB4E8; --brand-ink:#EAF3F7; --brand-soft:#153C4F;
+    --good:#4FCB8B; --good-soft:#13332A;
+    --warn:#E4B04C; --warn-soft:#3A2E15;
+    --crit:#F0796F; --crit-soft:#3C1E1C;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px -12px rgba(0,0,0,.55);
+    color-scheme: dark;
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{ max-width:960px; margin:0 auto; padding-inline:20px; }
+  h1,h2,h3{ font-family:'Sora',system-ui,sans-serif; letter-spacing:-0.01em; text-wrap:balance; margin:0; color:var(--navy);}
+  code, .mono{ font-family:'IBM Plex Mono', ui-monospace, monospace; }
+  a{ color:var(--brand); }
+  p{ line-height:1.6; color:var(--ink); }
+  .muted{ color:var(--muted); }
+
+  /* ---- top bar ---- */
+  .topbar{
+    position:sticky; top:env(safe-area-inset-top,0px); z-index:40;
+    background:color-mix(in srgb, var(--paper) 88%, transparent);
+    backdrop-filter:blur(10px); border-bottom:1px solid var(--line);
+  }
+  .topbar-inner{ display:flex; align-items:center; justify-content:space-between; gap:16px; padding-block:12px; max-width:960px; margin:0 auto; padding-inline:20px;}
+  .brandmark{ display:flex; align-items:center; gap:8px; font-family:'Sora'; font-weight:700; font-size:14px; color:var(--navy); white-space:nowrap;}
+  .brandmark .dot{ width:9px;height:9px;border-radius:3px; background:linear-gradient(135deg,var(--brand),var(--navy)); flex:none; }
+  nav.toplinks{ display:flex; gap:18px; overflow-x:auto; scrollbar-width:none; }
+  nav.toplinks::-webkit-scrollbar{ display:none; }
+  nav.toplinks a{ font-size:12.5px; font-weight:600; color:var(--muted); text-decoration:none; white-space:nowrap; }
+  nav.toplinks a:hover{ color:var(--brand); }
+
+  /* ---- hero ---- */
+  .hero{ padding-block:44px 30px; border-bottom:1px solid var(--line); }
+  .eyebrow{ display:inline-flex; align-items:center; gap:7px; font-family:'IBM Plex Mono'; font-size:11px; font-weight:500; letter-spacing:.06em; text-transform:uppercase; color:var(--brand-ink); background:var(--brand-soft); border:1px solid color-mix(in srgb, var(--brand) 35%, transparent); padding:5px 10px; border-radius:100px; }
+  .hero h1{ font-size:clamp(28px,4.4vw,42px); margin-top:14px; line-height:1.08; }
+  .hero .lede{ max-width:62ch; font-size:16.5px; color:var(--muted); margin-top:14px; }
+  .metarow{ display:flex; flex-wrap:wrap; gap:10px 22px; margin-top:22px; font-size:12.5px; }
+  .metarow div{ display:flex; gap:6px; }
+  .metarow b{ color:var(--navy); font-weight:600; }
+  .metarow span{ color:var(--muted); }
+
+  /* ---- sections ---- */
+  section{ padding-block:40px; border-bottom:1px solid var(--line); }
+  section:last-of-type{ border-bottom:none; }
+  .kicker{ font-family:'IBM Plex Mono'; font-size:11.5px; font-weight:500; letter-spacing:.07em; text-transform:uppercase; color:var(--brand); margin-bottom:8px; }
+  .sec-head{ margin-bottom:26px; }
+  .sec-head h2{ font-size:clamp(21px,2.6vw,27px); }
+  .sec-head p{ margin-top:8px; color:var(--muted); max-width:65ch; font-size:14.5px; }
+
+  /* ---- flow steps (How it connects) ---- */
+  .flow{ display:grid; grid-template-columns:repeat(6,1fr); gap:12px; }
+  @media (max-width:860px){ .flow{ grid-template-columns:1fr; } }
+  .flow-step{ background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:16px 14px; box-shadow:var(--shadow); position:relative; display:flex; flex-direction:column; gap:8px; }
+  .flow-num{ width:24px; height:24px; border-radius:7px; background:var(--navy); color:var(--paper); display:grid; place-items:center; font-family:'IBM Plex Mono'; font-size:12px; font-weight:600; }
+  .flow-step h4{ font-size:13px; font-weight:700; margin:0; color:var(--navy); line-height:1.3; }
+  .flow-step p{ font-size:12px; color:var(--muted); margin:0; line-height:1.45; }
+  .tag{ display:inline-block; font-family:'IBM Plex Mono'; font-size:10.5px; background:var(--surface-alt); border:1px solid var(--line); color:var(--brand-ink); padding:2px 6px; border-radius:5px; width:fit-content; }
+  .flow-arrow{ display:none; }
+  @media (min-width:861px){
+    .flow-step:not(:last-child)::after{ content:"→"; position:absolute; right:-13px; top:14px; color:var(--muted); font-size:13px; z-index:2;}
+  }
+
+  /* ---- demo ---- */
+  .demo-points{ list-style:none; margin:0 0 22px; padding:0; display:flex; flex-direction:column; gap:10px; }
+  .demo-points li{ font-size:13.5px; color:var(--ink); padding-left:18px; position:relative; line-height:1.55; }
+  .demo-points li::before{ content:"›"; position:absolute; left:0; color:var(--brand); font-weight:700; }
+  .demo-points b{ color:var(--navy); }
+  .browser-frame{ border:1px solid var(--line); border-radius:16px; overflow:hidden; box-shadow:var(--shadow); background:var(--surface); }
+  .browser-bar{ display:flex; align-items:center; gap:8px; padding:10px 12px; background:var(--surface-alt); border-bottom:1px solid var(--line); }
+  .browser-bar .dot{ width:10px; height:10px; border-radius:50%; flex:none; }
+  .browser-bar .url{ margin-left:8px; font-size:11.5px; color:var(--muted); background:var(--surface); border:1px solid var(--line); border-radius:7px; padding:4px 10px; flex:1; }
+  .fullscreen-link{ font-size:12px; font-weight:600; color:var(--brand); text-decoration:none; white-space:nowrap; }
+  .fullscreen-link:hover{ text-decoration:underline; }
+  .browser-frame iframe{ display:block; width:100%; height:720px; border:none; background:var(--surface); }
+  @media (max-width:700px){ .browser-frame iframe{ height:580px; } }
+
+  .demo-shell{ background:var(--surface); border:1px solid var(--line); border-radius:18px; box-shadow:var(--shadow); overflow:hidden; }
+  .demo-tabs{ display:flex; gap:2px; padding:10px; background:var(--surface-alt); overflow-x:auto; }
+  .demo-tab{ flex:1; min-width:120px; display:flex; align-items:center; gap:8px; padding:9px 12px; border-radius:10px; border:1px solid transparent; background:transparent; cursor:pointer; font-family:'Inter'; font-size:12px; font-weight:600; color:var(--muted); transition:background .15s,color .15s; text-align:left;}
+  .demo-tab .n{ font-family:'IBM Plex Mono'; font-size:11px; width:18px; height:18px; border-radius:5px; background:var(--line); color:var(--muted); display:grid; place-items:center; flex:none; }
+  .demo-tab.active{ background:var(--surface); border-color:var(--line); color:var(--navy); box-shadow:0 1px 2px rgba(0,0,0,.05); }
+  .demo-tab.active .n{ background:var(--brand); color:#fff; }
+  .demo-tab.done .n{ background:var(--good); color:#fff; }
+  .demo-body{ padding:26px 24px 28px; min-height:360px; }
+  .panel{ display:none; animation:fade .35s ease; }
+  .panel.active{ display:block; }
+  @keyframes fade{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
+  .panel h3{ font-size:16px; margin-bottom:4px; }
+  .panel .sub{ font-size:12.5px; color:var(--muted); margin-bottom:18px; }
+
+  .mockcard{ background:var(--surface-alt); border:1px solid var(--line); border-radius:14px; padding:18px; }
+  .row{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .session-note{ display:flex; align-items:center; gap:8px; font-size:11.5px; color:var(--muted); margin-bottom:16px; }
+  .session-note .mono{ background:var(--surface); border:1px solid var(--line); padding:2px 7px; border-radius:6px; color:var(--brand-ink); }
+
+  .pill{ display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:700; letter-spacing:.02em; padding:3px 9px; border-radius:100px; }
+  .pill.draft{ background:var(--warn-soft); color:var(--warn); }
+  .pill.live{ background:var(--good-soft); color:var(--good); }
+  .pill.paid{ background:var(--good-soft); color:var(--good); }
+  .pill.pending{ background:var(--warn-soft); color:var(--warn); }
+  .pill.crit{ background:var(--crit-soft); color:var(--crit); }
+
+  .tier{ display:flex; align-items:center; justify-content:space-between; padding:11px 2px; border-top:1px solid var(--line); font-size:13px; }
+  .tier:first-of-type{ border-top:none; }
+  .tier .name{ font-weight:600; color:var(--navy); }
+  .tier .cap{ font-size:11.5px; color:var(--muted); font-family:'IBM Plex Mono'; }
+  .tier .price{ font-family:'IBM Plex Mono'; font-weight:600; font-variant-numeric:tabular-nums; }
+
+  .btn{ appearance:none; border:none; cursor:pointer; font-family:'Inter'; font-weight:700; font-size:13px; padding:10px 18px; border-radius:10px; background:var(--navy); color:var(--paper); transition:opacity .15s, transform .1s; }
+  .btn:hover{ opacity:.9; } .btn:active{ transform:scale(.98); }
+  .btn.ghost{ background:transparent; color:var(--navy); border:1px solid var(--line); }
+  .btn.brand{ background:var(--brand); color:#fff; }
+  .btn:disabled{ opacity:.45; cursor:not-allowed; }
+  .btnrow{ display:flex; gap:10px; margin-top:20px; flex-wrap:wrap; }
+
+  .storefront{ max-width:340px; margin:0 auto; border:1px solid var(--line); border-radius:18px; overflow:hidden; background:var(--surface); box-shadow:var(--shadow); }
+  .storefront .cover{ height:96px; background:linear-gradient(135deg,var(--navy),var(--brand)); position:relative; }
+  .storefront .cover span{ position:absolute; bottom:10px; left:14px; color:#fff; font-family:'Sora'; font-weight:700; font-size:15px; }
+  .storefront .body{ padding:16px; }
+  .qty{ display:flex; align-items:center; gap:10px; }
+  .qty button{ width:26px;height:26px;border-radius:7px;border:1px solid var(--line); background:var(--surface-alt); color:var(--navy); font-weight:700; cursor:pointer; }
+  .qty output{ font-family:'IBM Plex Mono'; font-weight:600; min-width:16px; text-align:center; }
+
+  .paymethods{ display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
+  .paymethod{ border:1px solid var(--line); background:var(--surface); padding:9px 13px; border-radius:10px; font-size:12.5px; font-weight:600; cursor:pointer; color:var(--muted); }
+  .paymethod.sel{ border-color:var(--brand); color:var(--brand-ink); background:var(--brand-soft); }
+
+  .checkout-total{ display:flex; justify-content:space-between; align-items:baseline; padding-top:14px; margin-top:14px; border-top:1px dashed var(--line); }
+  .checkout-total b{ font-family:'IBM Plex Mono'; font-size:19px; font-variant-numeric:tabular-nums; }
+
+  .spinner{ width:15px;height:15px;border-radius:50%; border:2px solid color-mix(in srgb, currentColor 25%, transparent); border-top-color:currentColor; display:inline-block; animation:spin .7s linear infinite; }
+  @keyframes spin{ to{ transform:rotate(360deg);} }
+  @media (prefers-reduced-motion: reduce){ .spinner{ animation:none; } .panel{ animation:none; } }
+
+  .kv{ display:grid; grid-template-columns:auto 1fr; gap:6px 14px; font-size:12.5px; }
+  .kv dt{ color:var(--muted); }
+  .kv dd{ margin:0; font-family:'IBM Plex Mono'; color:var(--navy); }
+
+  .wallet-tile{ background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:16px 18px; }
+  .wallet-amt{ font-family:'IBM Plex Mono'; font-size:26px; font-weight:600; font-variant-numeric:tabular-nums; color:var(--navy); }
+  .wallet-delta{ font-size:12px; color:var(--good); font-weight:600; }
+
+  .ticket{ border:1px dashed var(--line); border-radius:14px; padding:16px; display:flex; gap:16px; align-items:center; background:var(--surface); }
+  .qrbox{ width:64px; height:64px; flex:none; border-radius:8px; background:
+      repeating-linear-gradient(0deg, var(--navy) 0 4px, transparent 4px 8px),
+      repeating-linear-gradient(90deg, var(--navy) 0 4px, transparent 4px 8px);
+    background-blend-mode:multiply; background-color:var(--surface); border:1px solid var(--line); }
+
+  .scan-frame{ width:100%; max-width:260px; aspect-ratio:1; margin:0 auto; border-radius:18px; border:2px dashed var(--line); display:grid; place-items:center; background:var(--surface-alt); position:relative; overflow:hidden; }
+  .scan-frame .beam{ position:absolute; left:8%; right:8%; height:2px; background:var(--brand); box-shadow:0 0 12px var(--brand); animation:sweep 1.4s ease-in-out infinite; }
+  @keyframes sweep{ 0%{ top:12%; } 50%{ top:85%; } 100%{ top:12%; } }
+  @media (prefers-reduced-motion: reduce){ .scan-frame .beam{ animation:none; top:50%;} }
+  .scan-result{ text-align:center; }
+  .scan-result .big{ font-size:30px; }
+
+  /* ---- build cards ---- */
+  .cols3{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+  @media (max-width:820px){ .cols3{ grid-template-columns:1fr; } }
+  .buildcard{ background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:18px; box-shadow:var(--shadow); }
+  .buildcard h4{ font-size:13px; color:var(--navy); margin-bottom:12px; display:flex; align-items:center; gap:8px;}
+  .buildcard h4 .sw{ width:8px;height:8px;border-radius:2px; background:var(--brand); }
+  .buildcard ul{ margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:9px; }
+  .buildcard li{ font-size:12.8px; color:var(--ink); line-height:1.5; padding-left:14px; position:relative; }
+  .buildcard li::before{ content:"–"; position:absolute; left:0; color:var(--muted); }
+  .reused{ margin-top:16px; background:var(--good-soft); border:1px solid color-mix(in srgb, var(--good) 30%, transparent); border-radius:14px; padding:16px 18px; display:flex; gap:14px; align-items:flex-start;}
+  .reused b{ color:var(--good); font-size:12px; text-transform:uppercase; letter-spacing:.04em; font-family:'IBM Plex Mono'; }
+  .reused p{ margin:4px 0 0; font-size:13px; }
+
+  /* ---- timeline ---- */
+  .timeline{ display:flex; flex-direction:column; gap:0; }
+  .tl-item{ display:grid; grid-template-columns:120px 1fr auto; gap:16px; padding:16px 0; border-top:1px solid var(--line); align-items:start; }
+  .tl-item:first-child{ border-top:none; }
+  @media (max-width:700px){ .tl-item{ grid-template-columns:1fr; gap:6px; } }
+  .tl-phase{ font-family:'Sora'; font-weight:700; font-size:13px; color:var(--navy); }
+  .tl-scope{ font-size:13px; color:var(--ink); line-height:1.55; }
+  .tl-effort{ font-family:'IBM Plex Mono'; font-size:12px; color:var(--brand-ink); background:var(--brand-soft); padding:4px 9px; border-radius:8px; white-space:nowrap; height:fit-content; }
+
+  /* ---- ask ---- */
+  .asks{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:700px){ .asks{ grid-template-columns:1fr; } }
+  .ask{ border:1px solid var(--line); background:var(--surface); border-radius:14px; padding:18px; box-shadow:var(--shadow); }
+  .ask .num{ font-family:'IBM Plex Mono'; color:var(--brand); font-size:12px; font-weight:700; }
+  .ask p{ margin-top:8px; font-size:13.5px; }
+
+  footer{ padding-block:30px 46px; }
+  footer p{ font-size:12px; color:var(--muted); }
+</style>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brandmark"><span class="dot"></span> EMS × Zoorya Pay</div>
+    <nav class="toplinks">
+      <a href="#connects">How it connects</a>
+      <a href="#demo">Live demo</a>
+      <a href="#building">What we're building</a>
+      <a href="#plan">Build plan</a>
+      <a href="#ask">Ask</a>
+    </nav>
+  </div>
+</div>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Merchant integration · build scope</span>
+    <h1>Event Management, wired straight into the Zoorya&nbsp;Pay wallet.</h1>
+    <p class="lede">EMS joins zooryapay-merchant as one more module — reached the same way E-commerce is reached today, paid for the same way every other order is paid for. No second login. No second payment provider. One wallet.</p>
+    <div class="metarow">
+      <div><b>Prepared for</b><span>CEO / Leadership review</span></div>
+      <div><b>Prepared by</b><span>Habtamu Bitew Gashu — Backoffice &amp; ERP Developer</span></div>
+      <div><b>Date</b><span>23 September 2026</span></div>
+    </div>
+  </header>
+
+  <section id="connects">
+    <div class="sec-head">
+      <div class="kicker">Architecture</div>
+      <h2>How it connects — the same pattern E‑commerce uses today</h2>
+      <p>Not a new integration shape. It's the mechanism zooryapay-merchant already uses to reach the ERP service, extended to one more backend.</p>
+    </div>
+    <div class="flow">
+      <div class="flow-step"><span class="flow-num">1</span><h4>Merchant session</h4><p>One sign-in. Eclipse issues a JWT the portal already holds — nothing new here.</p><span class="tag">JWT</span></div>
+      <div class="flow-step"><span class="flow-num">2</span><h4>api-gateway</h4><p>Every call carries the merchant's own organisation id.</p><span class="tag">X-Merchant-Id</span></div>
+      <div class="flow-step"><span class="flow-num">3</span><h4>EMS service</h4><p>Registered beside erp, integration-service, etradeAPI. Trusts the header the same way erp's own filter does.</p><span class="tag">eureka-server</span></div>
+      <div class="flow-step"><span class="flow-num">4</span><h4>Public route</h4><p>A buyer with no account reaches the storefront the same way today's public booking links work.</p><span class="tag">unauthenticated</span></div>
+      <div class="flow-step"><span class="flow-num">5</span><h4>Hosted checkout</h4><p>EMS opens a Zoorya Pay session — telebirr, M‑Pesa or EthSwitch.</p><span class="tag">zoorya-checkout</span></div>
+      <div class="flow-step"><span class="flow-num">6</span><h4>Wallet settles</h4><p>Webhook confirms. Money lands straight in the organiser's own wallet. EMS never holds it.</p><span class="tag">webhook</span></div>
+    </div>
+  </section>
+
+  <section id="demo">
+    <div class="sec-head">
+      <div class="kicker">Try it</div>
+      <h2>Live demo — the full organiser console and buyer checkout</h2>
+      <p>A real, click-through simulation — not just the walkthrough above. Manage events and ticket types, watch orders and attendees come in, check people in (including live camera QR scanning), run promo codes, and see exactly how money settles into Zoorya Pay. State is saved to your browser only; use Reset any time.</p>
+    </div>
+
+    <ul class="demo-points">
+      <li><b>Organiser console</b> — dashboard, events, tickets, orders, attendees, promo codes, and a Zoorya Pay payments view showing revenue by rail.</li>
+      <li><b>Public event page</b> — a real cart, promo codes, and a Zoorya Pay hosted-checkout simulation across telebirr, M‑Pesa and EthSwitch.</li>
+      <li><b>Check-in</b> — type a code, simulate a scan, or use a real camera (Chrome/Edge) to read a ticket's QR and mark it used.</li>
+    </ul>
+
+    <div class="browser-frame">
+      <div class="browser-bar">
+        <span class="dot" style="background:#EE6A5F"></span><span class="dot" style="background:#F5BD4F"></span><span class="dot" style="background:#61C454"></span>
+        <span class="url mono">tickets.zooryapay.et</span>
+        <a href="demo/index.html" target="_blank" rel="noopener" class="fullscreen-link">Open full‑screen ↗</a>
+      </div>
+      <iframe src="demo/index.html" title="EMS live demo" allow="camera" loading="lazy"></iframe>
+    </div>
+  </section>
+
+  <section id="building">
+    <div class="sec-head">
+      <div class="kicker">Scope</div>
+      <h2>What we're building</h2>
+    </div>
+    <div class="cols3">
+      <div class="buildcard">
+        <h4><span class="sw"></span>In zooryapay-merchant</h4>
+        <ul>
+          <li>A new "Events" tab in the E‑commerce hub — same tab‑strip pattern as Products, Inventory, Bookings.</li>
+          <li>No new sign‑in screen — the merchant's existing session is the credential into EMS.</li>
+        </ul>
+      </div>
+      <div class="buildcard">
+        <h4><span class="sw"></span>EMS backend (new service)</h4>
+        <ul>
+          <li>Event — venue, date/time, capacity, status; single date or multi‑date schedule.</li>
+          <li>Ticket types — tiered pricing, per‑type/per‑date capacity, sale windows, registration questions.</li>
+          <li>Order — multi‑ticket cart, promo codes, priced server‑side.</li>
+          <li>Public buyer storefront, reached through the gateway's public route.</li>
+          <li>Check‑in — camera/manual scan, live counts synced across devices.</li>
+          <li>Event‑level reporting — daily sales, per‑tier breakdown, CSV export.</li>
+        </ul>
+      </div>
+      <div class="buildcard">
+        <h4><span class="sw"></span>Payment — Zoorya Pay only</h4>
+        <ul>
+          <li>EMS starts a hosted‑checkout session per order — same contract the booking‑link flow already proves out.</li>
+          <li>Money settles straight into the organiser's existing wallet — no separate EMS‑side payout.</li>
+          <li>Refunds route through Zoorya Pay's existing refund mechanism.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="reused">
+      <div>
+        <b>Reused as‑is</b>
+        <p>Withdrawals, Payout accounts, Balance, Transactions, Reports, and the E‑commerce dashboard — ticket revenue shows up automatically the moment it's in the wallet, since these are all wallet‑level views already. Nothing new to build here.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="plan">
+    <div class="sec-head">
+      <div class="kicker">Timeline</div>
+      <h2>Build plan — ~4 weeks</h2>
+    </div>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-phase">1 — Gateway &amp; passthrough</div>
+        <div class="tl-scope">Register EMS behind api-gateway/eureka-server; wire the JWT → X‑Merchant‑Id passthrough for merchant calls; expose the public route for buyer‑facing calls.</div>
+        <div class="tl-effort">~1 week</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-phase">2 — Zoorya Pay payment</div>
+        <div class="tl-scope">EMS starts a hosted‑checkout session per order; webhook confirms and settles to the organiser's wallet; refunds wired through the existing mechanism.</div>
+        <div class="tl-effort">~2 weeks</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-phase">3 — Merchant portal</div>
+        <div class="tl-scope">New Events tab in zooryapay-merchant; confirm Withdrawals/Reports/E‑commerce dashboard show ticket revenue correctly end to end.</div>
+        <div class="tl-effort">~1 week</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="ask" style="border-bottom:none">
+    <div class="sec-head">
+      <div class="kicker">Decision</div>
+      <h2>Ask</h2>
+    </div>
+    <div class="asks">
+      <div class="ask"><div class="num">01</div><p>Sign‑off to start Phase 1 — gateway registration and passthrough.</p></div>
+      <div class="ask"><div class="num">02</div><p>Confirm every event organiser is expected to already be a KYB'd Zoorya Pay merchant, since EMS assumes an existing wallet to settle into.</p></div>
+    </div>
+  </section>
+
+  <footer>
+    <p>Habtamu Bitew Gashu — Backoffice &amp; ERP Developer, Etta Solution / ZooryaPay · habtamu.b@ettasolution.com</p>
+  </footer>
+</div>
+
