@@ -202,6 +202,24 @@ const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&
 const fmtDate = (d) => new Date(d).toLocaleString('en-GB', {weekday:'short', day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'});
 const fmtTime = (d) => new Date(d).toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'});
 
+/* ============ branding ============ */
+const FONTS = ['Outfit', 'Inter', 'Poppins', 'Playfair Display', 'Space Grotesk', 'Manrope'];
+const loadedFonts = new Set(['Inter']);
+function ensureFont(name) {
+  if (loadedFonts.has(name)) return;
+  loadedFonts.add(name);
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = 'https://fonts.googleapis.com/css2?family=' + name.replace(/ /g, '+') + ':wght@400;600;700&display=swap';
+  document.head.appendChild(link);
+}
+function luminance(hex) {
+  hex = String(hex || '#ffffff').replace('#', '');
+  const r = parseInt(hex.substr(0, 2), 16) || 0, g = parseInt(hex.substr(2, 2), 16) || 0, b = parseInt(hex.substr(4, 2), 16) || 0;
+  return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+}
+function defaultBranding() { return {coverImage: null, logo: null, bgType: 'color', accent: '#8b5cf6', bg: '#f5f3ff', colorMode: 'auto', font: 'Outfit'}; }
+
 function seed() {
   const now = Date.now(), day = 864e5;
   const events = [
@@ -254,10 +272,11 @@ function seed() {
       attendees.push({id:'A-' + (5000 + n), code:'TKT-' + uid(''), orderId:oid, eventId:ev.id, ticketId:t.id, ticket:t.name, name:q === 0 ? buyer : names[(i + q + 5) % names.length], email:buyer.toLowerCase().replace(' ', '.') + '@gmail.com', status:cancelledHere ? 'cancelled' : 'active', checkedIn:checked});
     }
   }
-  return {events, orders, attendees, currentEvent:'EV1', scanLog:[]};
+  return {events, orders, attendees, currentEvent:'EV1', scanLog:[], branding: defaultBranding()};
 }
 let S;
 try { S = JSON.parse(localStorage.getItem(KEY)) || seed(); } catch { S = seed(); }
+if (!S.branding) S.branding = defaultBranding();
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch {} }
 function resetDemo() { if (confirm('Reset all demo data?')) { S = seed(); save(); go('dashboard'); toast('Demo data reset'); } }
 
@@ -274,7 +293,8 @@ window.addEventListener('hashchange', () => { const r = location.hash.slice(1); 
 const NAV = [
   ['sec', 'Manage'], ['dashboard', '▦', 'Dashboard'], ['events', '◷', 'All events'],
   ['sec', 'This event'], ['event', '✎', 'Tickets & settings'], ['orders', '₿', 'Orders'], ['attendees', '☺', 'Attendees'], ['checkin', '⌁', 'Check-in'], ['promos', '%', 'Promo codes'],
-  ['sec', 'Payments'], ['payments', '⇄', 'Zoorya Pay']
+  ['sec', 'Payments'], ['payments', '⇄', 'Zoorya Pay'],
+  ['sec', 'Tools'], ['branding', '🎨', 'Homepage Designer']
 ];
 
 function render() {
@@ -289,7 +309,7 @@ function render() {
   if (isPub) return renderPublic();
   document.getElementById('evPick').innerHTML = S.events.map(e => `<option value="${e.id}" ${e.id === ev().id ? 'selected' : ''}>${esc(e.name)}</option>`).join('');
   document.getElementById('nav').innerHTML = NAV.map(n => n[0] === 'sec' ? `<div class="sec">${n[1]}</div>` : `<a class="${route === n[0] ? 'on' : ''}" onclick="go('${n[0]}')"><span>${n[1]}</span>${n[2]}</a>`).join('');
-  const views = {dashboard, events: eventsView, event: eventView, orders: ordersView, attendees: attendeesView, checkin: checkinView, promos: promosView, payments: paymentsView};
+  const views = {dashboard, events: eventsView, event: eventView, orders: ordersView, attendees: attendeesView, checkin: checkinView, promos: promosView, payments: paymentsView, branding: brandingView};
   document.getElementById('main').innerHTML = (views[route] || dashboard)();
   if (route === 'checkin') setTimeout(() => document.getElementById('scanInput')?.focus(), 50);
 }
@@ -595,6 +615,60 @@ function paymentsView() {
   </div>`;
 }
 
+/* ============ homepage designer ============ */
+function brandingView() {
+  const br = S.branding;
+  ensureFont(br.font);
+  const warn = luminance(br.bg) > 0.35 && luminance(br.bg) < 0.65;
+  return `<div class="page-h"><h1>Homepage Designer</h1></div>
+  <p class="muted" style="margin-bottom:18px;max-width:640px">Customize your organizer page appearance — this brands the Organizer page and carries through to every event's public checkout.</p>
+  <div class="grid g2">
+    <div class="card pad">
+      <h3 style="margin-bottom:14px">Images</h3>
+      <label class="f"><span>Cover image</span>
+        ${br.coverImage ? `<img src="${br.coverImage}" style="width:100%;max-width:260px;height:90px;object-fit:cover;border-radius:8px;border:1px solid var(--line);display:block;margin-bottom:8px">` : `<div class="small muted" style="padding:16px;border:1px dashed var(--line);border-radius:8px;max-width:260px;text-align:center;margin-bottom:8px">No cover set</div>`}
+        <input class="input" type="file" accept="image/*" onchange="pickImage(this,'coverImage')"></label>
+      <label class="f"><span>Logo</span>
+        ${br.logo ? `<img src="${br.logo}" style="width:56px;height:56px;object-fit:cover;border-radius:10px;border:1px solid var(--line);display:block;margin-bottom:8px">` : ''}
+        <input class="input" type="file" accept="image/*" onchange="pickImage(this,'logo')"></label>
+    </div>
+    <div class="card pad">
+      <h3 style="margin-bottom:14px">Theme &amp; colors</h3>
+      <label class="f"><span>Background type</span>
+        <select class="input" onchange="brandingField('bgType',this.value)">
+          <option value="color" ${br.bgType === 'color' ? 'selected' : ''}>Color</option>
+          <option value="image" ${br.bgType === 'image' ? 'selected' : ''}>Cover image</option>
+        </select></label>
+      <label class="f"><span>Accent color</span><div class="small muted" style="margin-bottom:4px">Used for buttons and highlights</div>
+        <div class="row"><input type="color" value="${br.accent}" onchange="brandingField('accent',this.value)" style="width:44px;height:36px;padding:2px;border:1px solid var(--line);border-radius:8px"><input class="input" value="${br.accent}" onchange="brandingField('accent',this.value)"></div></label>
+      <label class="f"><span>Background color</span><div class="small muted" style="margin-bottom:4px">Applied as an overlay when using a cover image</div>
+        <div class="row"><input type="color" value="${br.bg}" onchange="brandingField('bg',this.value)" style="width:44px;height:36px;padding:2px;border:1px solid var(--line);border-radius:8px"><input class="input" value="${br.bg}" onchange="brandingField('bg',this.value)"></div></label>
+      <label class="f"><span>Color mode</span>
+        <select class="input" onchange="brandingField('colorMode',this.value)">
+          <option value="auto" ${br.colorMode === 'auto' ? 'selected' : ''}>Auto (detected from background)</option>
+          <option value="light" ${br.colorMode === 'light' ? 'selected' : ''}>Light text</option>
+          <option value="dark" ${br.colorMode === 'dark' ? 'selected' : ''}>Dark text</option>
+        </select>
+        ${warn ? '<div class="small" style="color:var(--warn);margin-top:6px">⚠ Text may be hard to read at this background color</div>' : ''}</label>
+    </div>
+  </div>
+  <div class="card pad" style="margin-top:14px">
+    <h3 style="margin-bottom:10px">Typography</h3>
+    <label class="f"><span>Font family</span><div class="small muted" style="margin-bottom:4px">Loaded from Google Fonts on demand</div>
+      <select class="input" onchange="brandingField('font',this.value)">${FONTS.map(f => `<option value="${f}" ${br.font === f ? 'selected' : ''}>${f}</option>`).join('')}</select></label>
+    <div style="font-family:'${br.font}',sans-serif;font-size:20px;padding:16px;border:1px solid var(--line);border-radius:10px;background:var(--bg)">The quick brown fox jumps over the lazy dog.</div>
+  </div>
+  <div class="row" style="margin-top:16px;justify-content:flex-end"><button class="btn" onclick="resetBranding()">Reset to defaults</button><button class="btn primary" onclick="go('orghome')">Preview organizer page ↗</button></div>`;
+}
+function brandingField(k, v) { S.branding[k] = v; if (k === 'font') ensureFont(v); save(); render(); }
+function pickImage(input, field) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => { S.branding[field] = reader.result; save(); render(); toast((field === 'logo' ? 'Logo' : 'Cover image') + ' updated'); };
+  reader.readAsDataURL(file);
+}
+function resetBranding() { S.branding = defaultBranding(); save(); render(); toast('Branding reset to defaults'); }
+
 /* ============ modals: event / ticket ============ */
 function createEventModal() {
   modal(`<h2>Create event</h2>
@@ -643,7 +717,8 @@ function delTicket(id) {
 function renderPublic() {
   const e = ev();
   const sub = cartTotals();
-  document.getElementById('pubView').innerHTML = `<div class="pub">
+  const br = S.branding; ensureFont(br.font);
+  document.getElementById('pubView').innerHTML = `<div class="pub" style="--brand:${br.accent};font-family:'${br.font}',sans-serif">
     <div class="pub-hero" style="background:${COVERS[e.cover % COVERS.length]}">
       <span class="badge" style="background:rgba(255,255,255,.2);color:#fff;border:0">${new Date(e.start).toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long'})}</span>
       <h1>${esc(e.name)}</h1><div style="opacity:.9">📍 ${esc(e.venue)} · 🕘 ${fmtTime(e.start)}</div>
@@ -714,10 +789,16 @@ function notifyWaitlist(wid) {
 }
 function renderOrgHome() {
   const live = S.events.filter(e => e.status === 'live');
-  document.getElementById('pubView').innerHTML = `<div class="pub">
-    <div class="pub-hero" style="background:linear-gradient(135deg,#0f7a53,#0a5c3f)">
+  const br = S.branding; ensureFont(br.font);
+  const textColor = br.colorMode === 'dark' ? '#1d1b26' : br.colorMode === 'light' ? '#f6f5fa' : (luminance(br.bg) < 0.55 ? '#f6f5fa' : '#1d1b26');
+  const heroStyle = br.bgType === 'image' && br.coverImage
+    ? `background-image:linear-gradient(rgba(15,12,30,.4),rgba(15,12,30,.4)),url('${br.coverImage}');background-size:cover;background-position:center`
+    : `background:${br.accent}`;
+  document.getElementById('pubView').innerHTML = `<div class="pub" style="--brand:${br.accent};background:${br.bg};font-family:'${br.font}',sans-serif;min-height:100vh;color:${textColor}">
+    <div class="pub-hero" style="${heroStyle}">
+      ${br.logo ? `<img src="${br.logo}" style="width:44px;height:44px;object-fit:cover;border-radius:10px;margin-bottom:10px;display:block">` : ''}
       <span class="badge" style="background:rgba(255,255,255,.2);color:#fff;border:0">Organizer</span>
-      <h1>Zoorya Events</h1><div style="opacity:.9">All upcoming events, ticketed and settled through Zoorya Pay.</div>
+      <h1 style="color:#fff">Zoorya Events</h1><div style="opacity:.9;color:#fff">All upcoming events, ticketed and settled through Zoorya Pay.</div>
     </div>
     <div class="grid g3">${live.map(e => {
       const s = evAttendees(e).filter(a => a.status === 'active').length;
