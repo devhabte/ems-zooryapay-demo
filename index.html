@@ -240,8 +240,6 @@
       <a href="#connects">How it connects</a>
       <a href="#demo">Live demo</a>
       <a href="#building">What we're building</a>
-      <a href="#plan">Build plan</a>
-      <a href="#ask">Ask</a>
     </nav>
   </div>
 </div>
@@ -337,44 +335,5 @@
       </div>
     </div>
   </section>
-
-  <section id="plan">
-    <div class="sec-head">
-      <div class="kicker">Timeline</div>
-      <h2>Build plan — ~4 weeks</h2>
-    </div>
-    <div class="timeline">
-      <div class="tl-item">
-        <div class="tl-phase">1 — Gateway &amp; passthrough</div>
-        <div class="tl-scope">Register EMS behind api-gateway/eureka-server; wire the JWT → X‑Merchant‑Id passthrough for merchant calls; expose the public route for buyer‑facing calls.</div>
-        <div class="tl-effort">~1 week</div>
-      </div>
-      <div class="tl-item">
-        <div class="tl-phase">2 — Zoorya Pay payment</div>
-        <div class="tl-scope">EMS starts a hosted‑checkout session per order; webhook confirms and settles to the organiser's wallet; refunds wired through the existing mechanism.</div>
-        <div class="tl-effort">~2 weeks</div>
-      </div>
-      <div class="tl-item">
-        <div class="tl-phase">3 — Merchant portal</div>
-        <div class="tl-scope">New Events tab in zooryapay-merchant; confirm Withdrawals/Reports/E‑commerce dashboard show ticket revenue correctly end to end.</div>
-        <div class="tl-effort">~1 week</div>
-      </div>
-    </div>
-  </section>
-
-  <section id="ask" style="border-bottom:none">
-    <div class="sec-head">
-      <div class="kicker">Decision</div>
-      <h2>Ask</h2>
-    </div>
-    <div class="asks">
-      <div class="ask"><div class="num">01</div><p>Sign‑off to start Phase 1 — gateway registration and passthrough.</p></div>
-      <div class="ask"><div class="num">02</div><p>Confirm every event organiser is expected to already be a KYB'd Zoorya Pay merchant, since EMS assumes an existing wallet to settle into.</p></div>
-    </div>
-  </section>
-
-  <footer>
-    <p>Habtamu Bitew Gashu — Backoffice &amp; ERP Developer, Etta Solution / ZooryaPay · habtamu.b@ettasolution.com</p>
-  </footer>
 </div>
 
